@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.aitradingarena.backend</string>
+
+    <!-- caffeinate keeps the Mac awake; uvicorn serves the arena.
+         KeepAlive restarts it if it ever crashes; RunAtLoad starts on login. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/caffeinate</string>
+        <string>-dimsu</string>
+        <string>/Volumes/SSD/SelfProject/ai-trading-arena/backend/.venv/bin/uvicorn</string>
+        <string>app.main:app</string>
+        <string>--port</string>
+        <string>8000</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Volumes/SSD/SelfProject/ai-trading-arena/backend</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Volumes/SSD/SelfProject/ai-trading-arena/deploy/backend.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Volumes/SSD/SelfProject/ai-trading-arena/deploy/backend.err.log</string>
+</dict>
+</plist>

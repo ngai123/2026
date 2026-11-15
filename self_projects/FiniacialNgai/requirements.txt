@@ -1,0 +1,26 @@
+# Core
+streamlit>=1.40.0
+anthropic>=0.40.0
+openai>=1.30.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# Data & Database
+pandas>=2.2.0
+numpy>=1.26.0
+scipy>=1.13.0
+numpy-financial>=1.0.0
+
+# Web Scraping
+httpx>=0.27.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# Financial Data
+yfinance>=0.2.50
+
+# Visualization
+plotly>=5.20.0
+
+# Utilities
+cachetools>=5.3.0

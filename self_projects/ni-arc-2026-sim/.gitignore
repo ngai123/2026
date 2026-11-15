@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+mjcf/world.xml
+docs/screenshots/*.png
+.research/

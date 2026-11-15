@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<mujoco model="robot_diff">
+  <compiler angle="degree" coordinate="local"/>
+  <option timestep="0.005" gravity="0 0 -9.81" integrator="implicitfast"/>
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.4 0.4 0.4"/>
+    <global offwidth="1280" offheight="720"/>
+  </visual>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.6 0.8 1.0" rgb2="0.2 0.3 0.5" width="256" height="256"/>
+  </asset>
+  <worldbody>
+    <light directional="true" pos="0 0 6" dir="0 0 -1" diffuse="0.8 0.8 0.8"/>
+    <geom name="floor" type="plane" pos="0 0 0" size="3 3 0.1" rgba="0.9 0.9 0.85 1.0" friction="0.9 0.005 0.0001"/>
+    <body name="robot_red" pos="0 0 0.12" euler="0 0 0">
+      <freejoint name="robot_free"/>
+      <geom name="chassis_box" type="box" pos="0 0 0" size="0.25 0.2 0.1" rgba="0.200 0.400 0.600 1.000" contype="1" conaffinity="1"/>
+      <body name="wheel_left" pos="0 0.23 -0.045">
+        <joint name="wheel_left" type="hinge" axis="0 1 0" limited="false" damping="0.01"/>
+        <geom name="wheel_left_geom" type="cylinder" fromto="0 -0.02 0 0 0.02 0" size="0.075" rgba="0.133 0.133 0.133 1.000" contype="1" conaffinity="1" mass="0.4"/>
+      </body>
+      <body name="wheel_right" pos="0 -0.23 -0.045">
+        <joint name="wheel_right" type="hinge" axis="0 1 0" limited="false" damping="0.01"/>
+        <geom name="wheel_right_geom" type="cylinder" fromto="0 -0.02 0 0 0.02 0" size="0.075" rgba="0.133 0.133 0.133 1.000" contype="1" conaffinity="1" mass="0.4"/>
+      </body>
+      <body name="caster_front" pos="0.22 0 -0.095">
+        <joint name="caster_front_j" type="ball" damping="0.0001" limited="false"/>
+        <geom name="caster_front_geom" type="sphere" size="0.025" mass="0.05" rgba="0.400 0.400 0.400 1.000" contype="1" conaffinity="1"/>
+      </body>
+      <body name="caster_back" pos="-0.22 0 -0.095">
+        <joint name="caster_back_j" type="ball" damping="0.0001" limited="false"/>
+        <geom name="caster_back_geom" type="sphere" size="0.025" mass="0.05" rgba="0.400 0.400 0.400 1.000" contype="1" conaffinity="1"/>
+      </body>
+      <body name="intake_roller" pos="0.3 0 -0.07">
+        <joint name="intake_roller" type="hinge" axis="0 1 0" limited="false" damping="0.01"/>
+        <geom name="intake_roller_geom" type="cylinder" fromto="0 -0.2 0  0 0.2 0" size="0.025" mass="0.2" rgba="0.800 0.267 0.267 1.000" friction="1.5 0.01 0.001" contype="1" conaffinity="1"/>
+      </body>
+      <body name="pitch_arm" pos="-0.25 0 0.08" euler="0 30 0">
+        <joint name="pitch_arm" type="hinge" axis="0 1 0" limited="true" range="-1.22173 -0.174533" damping="0.1"/>
+        <geom name="pitch_arm_geom" type="box" pos="-0.1 0 0" size="0.1 0.015 0.015" rgba="0.533 0.400 0.267 1.000" contype="1" conaffinity="1" mass="0.3"/>
+        <body name="flywheel_left" pos="-0.2 0.09 0">
+          <joint name="flywheel_left" type="hinge" axis="0 1 0" limited="false" damping="0.001"/>
+          <geom name="flywheel_left_geom" type="cylinder" fromto="0 -0.0125 0 0 0.0125 0" size="0.06" rgba="0.867 0.533 0.000 1.000" contype="1" conaffinity="1" mass="0.2"/>
+        </body>
+        <body name="flywheel_right" pos="-0.2 -0.09 0">
+          <joint name="flywheel_right" type="hinge" axis="0 1 0" limited="false" damping="0.001"/>
+          <geom name="flywheel_right_geom" type="cylinder" fromto="0 -0.0125 0 0 0.0125 0" size="0.06" rgba="0.867 0.533 0.000 1.000" contype="1" conaffinity="1" mass="0.2"/>
+        </body>
+      </body>
+      <geom name="camera_placeholder" type="box" pos="0.15 0 0.115" size="0.02 0.02 0.015" rgba="0.267 0.267 0.267 1.000" contype="0" conaffinity="0"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <velocity name="wheel_left" joint="wheel_left" kv="2" ctrlrange="-30 30"/>
+    <velocity name="wheel_right" joint="wheel_right" kv="2" ctrlrange="-30 30"/>
+    <velocity name="intake_roller" joint="intake_roller" kv="1" ctrlrange="-60 60"/>
+    <velocity name="flywheel_left" joint="flywheel_left" kv="3" ctrlrange="0 600"/>
+    <velocity name="flywheel_right" joint="flywheel_right" kv="3" ctrlrange="0 600"/>
+    <position name="pitch_arm" joint="pitch_arm" kp="50" ctrlrange="-1.22173 -0.174533"/>
+  </actuator>
+</mujoco>

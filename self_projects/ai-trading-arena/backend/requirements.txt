@@ -1,0 +1,31 @@
+# --- Web framework / server ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# --- Scheduler for the 24/7 trading loop ---
+APScheduler==3.11.0
+
+# --- Database + migrations ---
+SQLAlchemy==2.0.36
+alembic==1.14.0
+
+# --- HTTP (on-chain data providers) ---
+requests==2.32.3
+
+# --- Market data ---
+yfinance==1.2.0
+
+# --- LLM access via OpenRouter (OpenAI-compatible client) ---
+openai==1.59.6
+
+# --- Config / env ---
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+# Lets pydantic evaluate `X | None` annotations on Python 3.9.
+eval_type_backport==0.2.0
+
+# --- Market-hours / timezone handling ---
+pandas-market-calendars==4.5.0
+pytz==2024.2
+pytest==8.4.2

@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VitalScan MCP Server — Tool Briefing</title>
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #090c10;
+    --surface:   #0e1117;
+    --card:      #13181f;
+    --border:    #1e2630;
+    --accent:    #e85d2c;
+    --accent2:   #9d72ff;
+    --accent3:   #2ea043;
+    --gold:      #cca700;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --red:       #e85d2c;
+    --orange:    #d97706;
+    --blue:      #3b82f6;
+    --green:     #2ea043;
+    --purple:    #9d72ff;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── SLIDE CONTAINER ── */
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 64px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(24px);
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+  }
+  .nav button {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .nav button:hover { background: var(--border); border-color: var(--accent); }
+  .nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav .counter {
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 48px;
+    text-align: center;
+  }
+
+  /* Dots */
+  .dots {
+    position: fixed;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .dot.active { background: var(--accent); transform: scale(1.4); }
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  h1 { font-size: clamp(36px, 5vw, 64px); font-weight: 700; line-height: 1.1; }
+  h2 { font-size: clamp(24px, 3.5vw, 42px); font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+  h3 { font-size: clamp(16px, 2vw, 22px); font-weight: 600; }
+  p  { font-size: clamp(14px, 1.5vw, 18px); color: var(--muted); line-height: 1.7; max-width: 680px; }
+
+  .highlight { color: var(--accent); }
+  .highlight2 { color: var(--accent2); }
+  .highlight3 { color: var(--accent3); }
+  .highlight-gold { color: var(--gold); }
+
+  /* ── GRID HELPERS ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .three-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .card-value {
+    font-size: clamp(28px, 3.5vw, 42px);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .card-desc { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+  /* ── CATEGORY GRID ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .cat-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .cat-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .cat-icon { font-size: 22px; margin-bottom: 8px; }
+  .cat-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .cat-count {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+  .cat-tools { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #e6edf3;
+    text-align: left;
+    width: 100%;
+    overflow-x: auto;
+  }
+  .code-block .k  { color: #ff7b72; } /* keyword */
+  .code-block .s  { color: #a5d6ff; } /* string */
+  .code-block .n  { color: #79c0ff; } /* number */
+  .code-block .c  { color: #8b949e; } /* comment */
+  .code-block .p  { color: #9d72ff; } /* property */
+  .code-block .v  { color: #2ea043; } /* value/bool */
+
+  /* ── BADGE ROW ── */
+  .badge-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .badge-red    { color: var(--accent);  border-color: var(--accent);  background: rgba(232,93,44,.1); }
+  .badge-purple { color: var(--purple);  border-color: var(--purple);  background: rgba(157,114,255,.1); }
+  .badge-green  { color: var(--green);   border-color: var(--green);   background: rgba(46,160,67,.1); }
+  .badge-gold   { color: var(--gold);    border-color: var(--gold);    background: rgba(204,167,0,.1); }
+  .badge-blue   { color: var(--blue);    border-color: var(--blue);    background: rgba(59,130,246,.1); }
+
+  /* ── FEATURE LIST ── */
+  .feature-list { list-style: none; width: 100%; }
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list .icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .feature-list .desc { color: var(--muted); font-size: 13px; margin-top: 3px; }
+
+  /* ── UNIQUE TOOL SLIDE ── */
+  .tool-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    width: 100%;
+    max-width: 1100px;
+    align-items: start;
+  }
+  .tool-left { display: flex; flex-direction: column; gap: 16px; }
+  .tool-tag {
+    display: inline-block;
+    background: rgba(232,93,44,.15);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    width: fit-content;
+  }
+  .tool-tag.purple {
+    background: rgba(157,114,255,.15);
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+  .why-box {
+    background: rgba(46,160,67,.07);
+    border: 1px solid rgba(46,160,67,.3);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .why-box h4 { color: var(--green); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .why-box p  { font-size: 14px; color: var(--muted); max-width: none; }
+
+  /* ── STAT ROW ── */
+  .stat-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 16px;
+  }
+  .stat-pill {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+  }
+  .stat-pill .num {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat-pill .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 1000px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+  .flow-step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+  }
+  .flow-arrow {
+    font-size: 18px;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+  .flow-step.highlight-step {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .flow-step.highlight-step2 {
+    border-color: var(--purple);
+    color: var(--purple);
+  }
+
+  /* ── TITLE SLIDE SPECIAL ── */
+  .title-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(232,93,44,.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .title-content { text-align: center; position: relative; z-index: 1; }
+
+  /* ── SLIDE 2 SERVER INFO ── */
+  .server-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 24px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transition: width 1s ease;
+  }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    width: 48px; height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 16px 0;
+  }
+
+  /* Phase boxes */
+  .phase-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+  }
+  .phase-box h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: var(--muted);
+  }
+  .phase-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .phase-step:last-child { border: none; }
+  .phase-step .tool-name {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(232,93,44,.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .phase-step .tool-name.purple {
+    color: var(--purple);
+    background: rgba(157,114,255,.1);
+  }
+  .phase-step-label { color: var(--muted); font-size: 12px; }
+
+  /* ── SLIDE: SUMMARY ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 24px;
+  }
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .summary-card:hover { border-color: var(--accent); }
+  .summary-card .s-icon { font-size: 36px; margin-bottom: 12px; }
+  .summary-card .s-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .summary-card .s-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* keyboard hint */
+  .kbd-hint {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .kbd {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+
+  /* logo */
+  .logo {
+    position: fixed;
+    top: 20px;
+    left: 28px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- Logo -->
+<div class="logo">
+  <div class="logo-dot"></div>
+  VitalScan MCP Server
+</div>
+
+<!-- Keyboard hint -->
+<div class="kbd-hint">
+  <span class="kbd">←</span> <span class="kbd">→</span> to navigate
+</div>
+
+<!-- Dots navigation -->
+<div class="dots" id="dots"></div>
+
+<!-- Slide Deck -->
+<div class="deck" id="deck">
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 1 — TITLE
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide active" id="slide-0">
+    <div class="title-glow"></div>
+    <div class="title-content">
+      <div class="eyebrow">Metro Manila Search & Rescue</div>
+      <h1><span class="highlight">MCP Server</span><br/>Tool Briefing</h1>
+      <div class="sep" style="margin: 24px auto;"></div>
+      <p style="text-align:center; max-width: 520px; margin: 0 auto;">
+        A purpose-built FastMCP server exposing real-time drone control, thermal imaging,
+        and coordinated swarm intelligence — all via the Model Context Protocol.
+      </p>
+      <div class="badge-row" style="justify-content: center; margin-top: 28px;">
+        <span class="badge badge-red">FastMCP 1.2.0</span>
+        <span class="badge badge-blue">SSE Transport</span>
+        <span class="badge badge-purple">26 Tools</span>
+        <span class="badge badge-gold">Port 8766</span>
+        <span class="badge badge-green">4 Categories</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 2 — THE SERVER
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-1">
+    <div class="eyebrow">The Server</div>
+    <h2>What is our <span class="highlight">MCP Server?</span></h2>
+    <p style="margin-top: 8px;">
+      A FastMCP instance running over SSE (Server-Sent Events) that acts as the real-time bridge
+      between AI agents and a live rescue simulation — giving any MCP-compatible AI direct access
+      to physical drone operations.
+    </p>
+
+    <div class="server-grid">
+      <div class="card">
+        <div class="card-label">Protocol</div>
+        <div class="card-value" style="font-size: 28px; color: var(--accent);">FastMCP</div>
+        <div class="card-desc">SSE transport over HTTP. No polling — events pushed as they happen.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Endpoint</div>
+        <div class="card-value" style="font-size: 20px; color: var(--blue); font-family: monospace;">localhost:8766/sse</div>
+        <div class="card-desc">Connect any MCP client and immediately control the swarm.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Backed by</div>
+        <div class="card-value" style="font-size: 22px; color: var(--green);">Mesa + SQLite</div>
+        <div class="card-desc">Physics engine + persistent scan history database behind every tool call.</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-pill">
+        <div class="num highlight">26</div>
+        <div class="lbl">Exposed Tools</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num highlight2">4</div>
+        <div class="lbl">Tool Categories</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num highlight3">5 + 1</div>
+        <div class="lbl">Drones Controlled</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num highlight-gold">600</div>
+        <div class="lbl">Simulated Survivors</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 3 — 26 TOOLS OVERVIEW
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-2">
+
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:14px;">MCP Server</div>
+      <div style="font-size:clamp(32px,4.5vw,52px); font-weight:900; line-height:1; letter-spacing:-1px;">
+        <span style="color:var(--accent);">26</span> Tools.&nbsp;&nbsp;<span style="color:var(--purple);">4</span> Modules.
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:960px;">
+
+      <!-- Drone Management -->
+      <div class="cat-item" style="padding:22px 24px;">
+        <div class="cat-icon">🚁</div>
+        <div class="cat-name" style="font-size:15px; margin-bottom:4px;">Drone Management</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.6;">Keep every drone visible, healthy, and in position at all times.</div>
+        <span class="cat-count">7 tools</span>
+        <div class="cat-tools" style="margin-top:10px; line-height:1.9;">
+          get_active_drones<br/>
+          get_battery_status · get_drone_info<br/>
+          get_all_drones_status<br/>
+          move_drone_to · override_drone_target<br/>
+          recall_drone_to_base
+        </div>
+      </div>
+
+      <!-- Scanning & Detection -->
+      <div class="cat-item" style="border-color:rgba(232,93,44,.5); padding:22px 24px;">
+        <div class="cat-icon">🌡️</div>
+        <div class="cat-name" style="font-size:15px; color:var(--accent); margin-bottom:4px;">Scanning & Detection</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.6;">Search the disaster zone for thermal signals and pinpoint survivor locations.</div>
+        <span class="cat-count" style="background:var(--accent);">1 tool ★</span>
+        <div class="cat-tools" style="margin-top:10px; line-height:1.9;">
+          thermal_scan
+        </div>
+      </div>
+
+      <!-- Navigation & Coordination -->
+      <div class="cat-item" style="border-color:rgba(157,114,255,.5); padding:22px 24px;">
+        <div class="cat-icon">🧭</div>
+        <div class="cat-name" style="font-size:15px; color:var(--purple); margin-bottom:4px;">Navigation & Coordination</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.6;">Direct 5 drones through complex formation logic — handling low battery and role swaps without breaking formation.</div>
+        <span class="cat-count" style="background:var(--purple);">8 tools ★</span>
+        <div class="cat-tools" style="margin-top:10px; line-height:1.9;">
+          get_next_sweep_waypoint<br/>
+          get_zone_assignment · advance_zone_waypoint<br/>
+          get_arc_waypoints · advance_arc_waypoint<br/>
+          get_team_waypoint · advance_team_sector<br/>
+          get_team_sector_status
+        </div>
+      </div>
+
+      <!-- Mission Control -->
+      <div class="cat-item" style="border-color:rgba(46,160,67,.35); padding:22px 24px;">
+        <div class="cat-icon">📊</div>
+        <div class="cat-name" style="font-size:15px; color:var(--green); margin-bottom:4px;">Mission Control</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.6;">Track overall rescue progress, manage the search map, and control the simulation state.</div>
+        <span class="cat-count" style="background:var(--green);">6 tools</span>
+        <div class="cat-tools" style="margin-top:10px; line-height:1.9;">
+          get_mission_status · get_sector_info<br/>
+          get_mapping_status<br/>
+          get_scanned_areas_db · get_known_survivors<br/>
+          set_mission_paused
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 4 — UNIQUE TOOL #1: thermal_scan
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-3">
+    <div class="eyebrow">Unique Tool — #1 of 2</div>
+    <div class="tool-layout">
+
+      <div class="tool-left">
+        <div>
+          <div class="tool-tag">Thermal Scanning</div>
+          <h2 style="margin-top: 8px;"><span style="font-family: monospace; font-size: 0.85em;">thermal_scan</span></h2>
+        </div>
+        <div class="sep" style="margin: 8px 0;"></div>
+        <p style="max-width: none;">
+          Simulates an infrared sensor sweep at the drone's current GPS position,
+          returning every survivor within a <strong style="color: var(--text);">100 m radius</strong> — with critical-injury flags
+          and exact coordinates — all in a single tool call.
+        </p>
+
+        <div class="badge-row">
+          <span class="badge badge-red">Sensor Simulation</span>
+          <span class="badge badge-gold">100 m Radius</span>
+          <span class="badge badge-green">Persistent via SQLite</span>
+        </div>
+
+        <div class="why-box" style="margin-top: 8px;">
+          <h4>Why it's irreplaceable</h4>
+          <p>
+            No generic MCP server has a sensor model. <code style="color: var(--accent);">thermal_scan</code> is the
+            only way an AI agent can "see" survivors in our simulation. Without it, the rescue
+            swarm is blind — it moves but cannot act. Every rescue decision flows downstream
+            from this single tool's output.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Response Example</div>
+        <div class="code-block">
+{<br/>
+&nbsp;&nbsp;<span class="p">"drone_id"</span>: <span class="s">"drone_21"</span>,<br/>
+&nbsp;&nbsp;<span class="p">"position"</span>: {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">"x"</span>: <span class="n">120.993</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">"y"</span>: <span class="n">14.601</span><br/>
+&nbsp;&nbsp;},<br/>
+&nbsp;&nbsp;<span class="p">"survivors_found"</span>: [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">"id"</span>: <span class="s">"survivor_14"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">"x"</span>: <span class="n">121.001</span>, <span class="p">"y"</span>: <span class="n">14.610</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">"critical"</span>: <span class="v">true</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="p">"rescued"</span>: <span class="v">false</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;],<br/>
+&nbsp;&nbsp;<span class="p">"scan_radius_km"</span>: <span class="n">0.1</span>,<br/>
+&nbsp;&nbsp;<span class="p">"tick"</span>: <span class="n">142</span><br/>
+}
+        </div>
+        <div style="margin-top: 12px; font-size: 12px; color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px;">
+          🧠 <strong style="color: var(--text);">How agents use it:</strong> The LLM reads <code style="color: var(--accent);">critical: true</code> to
+          triage survivors and re-route the fleet accordingly — zero human intervention.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 5 — UNIQUE TOOL #2: Team Sector Sweep
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-4">
+    <div class="eyebrow">Unique Tool — #2 of 2</div>
+    <div class="tool-layout">
+
+      <div class="tool-left">
+        <div>
+          <div class="tool-tag purple">Team Sector Sweep</div>
+          <h2 style="margin-top: 8px;"><span style="font-family: monospace; font-size: 0.78em;">get_team_waypoint<br/>advance_team_sector</span></h2>
+        </div>
+        <div class="sep" style="margin: 8px 0; background: var(--purple);"></div>
+        <p style="max-width: none;">
+          A <strong style="color: var(--text);">collective consensus mechanism</strong> built into the tool layer.
+          All 5 drones sweep one sector simultaneously in assigned rings (OUTER / MIDDLE).
+          <code style="color: var(--purple); font-size: 13px;">advance_team_sector()</code> only promotes to the next sector
+          when <em>every single drone</em> has finished its role — enforced by the server, not the AI.
+        </p>
+
+        <div class="badge-row">
+          <span class="badge badge-purple">Multi-Agent Consensus</span>
+          <span class="badge badge-blue">5 Sectors · 5 Drones</span>
+          <span class="badge badge-gold">Server-Enforced</span>
+        </div>
+
+        <div class="why-box" style="margin-top: 8px; border-color: rgba(157,114,255,.3); background: rgba(157,114,255,.05);">
+          <h4 style="color: var(--purple);">Why it's irreplaceable</h4>
+          <p>
+            No AI prompt can reliably coordinate 5 concurrent agents without race conditions.
+            This tool pair bakes the coordination <strong style="color: var(--text);">into the server itself</strong>:
+            agents just call <code style="color: var(--purple);">get_team_waypoint()</code> and trust the server to
+            gate the next sector — making the swarm stateless from the LLM's perspective.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">How Coordination Works</div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-size: 13px;">
+            <div style="color: var(--purple); font-weight: 700; margin-bottom: 4px;">5 Sectors — One at a Time</div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+              <span style="background: rgba(255,102,0,.2); color: #ff6600; padding: 3px 10px; border-radius: 4px; font-size: 12px;">Alpha 0°–72°</span>
+              <span style="background: rgba(232,93,44,.2); color: var(--accent); padding: 3px 10px; border-radius: 4px; font-size: 12px;">Bravo 72°–144°</span>
+              <span style="background: rgba(59,130,246,.2); color: var(--blue); padding: 3px 10px; border-radius: 4px; font-size: 12px;">Charlie 144°–216°</span>
+              <span style="background: rgba(46,160,67,.2); color: var(--green); padding: 3px 10px; border-radius: 4px; font-size: 12px;">Delta 216°–288°</span>
+              <span style="background: rgba(157,114,255,.2); color: var(--purple); padding: 3px 10px; border-radius: 4px; font-size: 12px;">Echo 288°–360°</span>
+            </div>
+          </div>
+
+          <div class="code-block" style="font-size: 12px;">
+<span class="c">// Each drone independently calls:</span><br/>
+get_team_waypoint(<span class="s">"drone_21"</span>)<br/>
+<span class="c">// → { x, y, ring: "OUTER", remaining: 27 }</span><br/><br/>
+<span class="c">// When ALL drones finish their ring:</span><br/>
+advance_team_sector()<br/>
+<span class="c">// → "not_ready" until all 5 report done</span><br/>
+<span class="c">// → { new_sector: "Bravo" } when consensus met</span>
+          </div>
+
+          <div style="background: var(--card); border: 1px solid rgba(157,114,255,.3); border-radius: 8px; padding: 14px 16px; font-size: 13px;">
+            <div style="color: var(--purple); font-weight: 700; margin-bottom: 4px;">Role Split</div>
+            <div style="color: var(--muted); font-size: 12px; line-height: 1.7;">
+              R1 / R2 / R3 → <strong style="color: var(--text);">OUTER ring</strong><br/>
+              R4 / R5 → <strong style="color: var(--text);">MIDDLE ring</strong><br/>
+              Server tracks each drone's completion independently.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 6 — MISSION PHASE FLOW
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-5">
+    <div class="eyebrow">How It All Connects</div>
+    <h2>The <span class="highlight">Mission Flow</span></h2>
+    <p style="margin-top: 6px;">26 tools chain into a two-phase rescue operation. Each phase has a strict tool order.</p>
+
+    <div class="two-col" style="margin-top: 28px; max-width: 1000px;">
+      <div class="phase-box">
+        <h4>Phase 1 — Map</h4>
+        <div class="phase-step">
+          <span class="tool-name">get_active_drones</span>
+          <span class="phase-step-label">Discover fleet at runtime</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name purple">get_team_waypoint</span>
+          <span class="phase-step-label">Get sector waypoint per drone</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name">move_drone_to</span>
+          <span class="phase-step-label">Fly to waypoint coordinates</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name" style="color: var(--accent);">thermal_scan ★</span>
+          <span class="phase-step-label">Detect survivors at position</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name purple">advance_team_sector ★</span>
+          <span class="phase-step-label">Consensus → next sector</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 12px; color: var(--muted);">
+          Repeats across all 5 sectors until 100% mapped.
+        </div>
+      </div>
+
+      <div class="phase-box">
+        <h4>Phase 2 — Rescue</h4>
+        <div class="phase-step">
+          <span class="tool-name">get_known_survivors</span>
+          <span class="phase-step-label">Load all detected survivors</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name">get_battery_status</span>
+          <span class="phase-step-label">Verify drone can reach target</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name">move_drone_to</span>
+          <span class="phase-step-label">Route to survivor (critical first)</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name" style="color: var(--accent);">thermal_scan ★</span>
+          <span class="phase-step-label">Confirm position, extract</span>
+        </div>
+        <div class="phase-step">
+          <span class="tool-name">get_mission_status</span>
+          <span class="phase-step-label">Check mission_complete flag</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 12px; color: var(--muted);">
+          Continues until all 600 survivors are rescued.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 24px; width: 100%; max-width: 1000px; font-size: 13px; color: var(--muted); text-align: center;">
+      Both unique tools — <span style="color: var(--accent); font-family: monospace;">thermal_scan</span> and <span style="color: var(--purple); font-family: monospace;">advance_team_sector</span> — appear in both phases. They are the engine of every rescue action.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 7 — TECH STACK
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-6">
+
+    <div style="text-align:center; margin-bottom:40px;">
+      <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:14px;">Tech Stack</div>
+      <div style="font-size:clamp(28px,4vw,48px); font-weight:900; line-height:1; letter-spacing:-1px;">How We Built It</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:860px;">
+
+      <!-- Simulation -->
+      <div style="display:flex; align-items:center; gap:0; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <div style="width:4px; height:100%; background:var(--orange); flex-shrink:0; align-self:stretch;"></div>
+        <div style="padding:18px 24px; display:flex; align-items:center; gap:24px; width:100%;">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); width:80px; flex-shrink:0;">Simulation</div>
+          <div style="font-size:16px; font-weight:800; color:var(--orange); width:120px; flex-shrink:0;">Mesa 3.0</div>
+          <div style="width:1px; height:28px; background:var(--border); flex-shrink:0;"></div>
+          <div style="font-size:13px; color:var(--muted);">Combined with <strong style="color:var(--text);">OpenStreetMap + OSRM routing</strong> — drones fly according to real-world roads.</div>
+        </div>
+      </div>
+
+      <!-- AI Framework -->
+      <div style="display:flex; align-items:center; gap:0; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <div style="width:4px; background:var(--purple); flex-shrink:0; align-self:stretch;"></div>
+        <div style="padding:18px 24px; display:flex; align-items:center; gap:24px; width:100%;">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); width:80px; flex-shrink:0;">AI Framework</div>
+          <div style="font-size:16px; font-weight:800; color:var(--purple); width:120px; flex-shrink:0;">LangGraph</div>
+          <div style="width:1px; height:28px; background:var(--border); flex-shrink:0;"></div>
+          <div style="font-size:13px; color:var(--muted);">Designs the <strong style="color:var(--text);">ReAct agent loop</strong>, the orchestrator, and the drone swarm process.</div>
+        </div>
+      </div>
+
+      <!-- Protocol -->
+      <div style="display:flex; align-items:center; gap:0; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <div style="width:4px; background:var(--accent); flex-shrink:0; align-self:stretch;"></div>
+        <div style="padding:18px 24px; display:flex; align-items:center; gap:24px; width:100%;">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); width:80px; flex-shrink:0;">Protocol</div>
+          <div style="font-size:16px; font-weight:800; color:var(--accent); width:120px; flex-shrink:0;">FastMCP + SSE</div>
+          <div style="width:1px; height:28px; background:var(--border); flex-shrink:0;"></div>
+          <div style="font-size:13px; color:var(--muted);">Using <strong style="color:var(--text);">Anthropic's open MCP 1.0</strong> — we built 26 functional tools in our MCP server.</div>
+        </div>
+      </div>
+
+      <!-- Backend -->
+      <div style="display:flex; align-items:center; gap:0; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <div style="width:4px; background:var(--blue); flex-shrink:0; align-self:stretch;"></div>
+        <div style="padding:18px 24px; display:flex; align-items:center; gap:24px; width:100%;">
+          <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); width:80px; flex-shrink:0;">Backend</div>
+          <div style="font-size:16px; font-weight:800; color:var(--blue); width:120px; flex-shrink:0;">FastAPI</div>
+          <div style="width:1px; height:28px; background:var(--border); flex-shrink:0;"></div>
+          <div style="font-size:13px; color:var(--muted);">Connects the <strong style="color:var(--text);">live map via WebSocket</strong> — real-time drone positions and mission state.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 8 — REACT MODEL
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-7c">
+
+    <div style="display:grid; grid-template-columns:1fr 1px 1fr; gap:0; width:100%; max-width:980px; align-items:center;">
+
+      <!-- LEFT -->
+      <div style="padding-right:64px;">
+        <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:24px;">AI Agent Framework</div>
+        <div style="font-size:clamp(56px,7vw,88px); font-weight:900; line-height:1; letter-spacing:-3px; margin-bottom:8px;">Re<span style="color:var(--accent);">A</span>ct</div>
+        <div style="font-size:13px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; margin-bottom:44px;">Reasoning + Acting</div>
+
+        <div style="display:flex; flex-direction:column; gap:28px;">
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div style="width:2px; min-height:44px; background:var(--purple); flex-shrink:0; margin-top:3px;"></div>
+            <div>
+              <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px;">Thought</div>
+              <div style="font-size:12px; color:var(--muted); line-height:1.6;">Models are forced to reason first — prevents hallucination and immature actions.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div style="width:2px; min-height:44px; background:var(--accent); flex-shrink:0; margin-top:3px;"></div>
+            <div>
+              <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px;">Action</div>
+              <div style="font-size:12px; color:var(--muted); line-height:1.6;">AI calls real tools — not just advice, but actual data from the real world.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div style="width:2px; min-height:44px; background:var(--green); flex-shrink:0; margin-top:3px;"></div>
+            <div>
+              <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px;">Observe</div>
+              <div style="font-size:12px; color:var(--muted); line-height:1.6;">AI stops and re-reads all collected data — adapts its next move to new information.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:36px; font-size:12px; color:var(--muted); font-style:italic; border-left:2px solid var(--border); padding-left:14px; line-height:1.7;">
+          Works on its own.<br/>No human required.
+        </div>
+      </div>
+
+      <!-- divider -->
+      <div style="background:var(--border); height:60%; width:1px;"></div>
+
+      <!-- RIGHT — triangle loop -->
+      <div style="padding-left:64px; display:flex; flex-direction:column; align-items:center;">
+        <div style="position:relative; width:250px; height:290px;">
+
+          <div style="position:absolute; top:0; left:50%; transform:translateX(-50%);">
+            <div style="width:100px; height:100px; border-radius:50%; border:1.5px solid var(--purple); background:rgba(157,114,255,.07); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="font-size:24px;">💭</div>
+              <div style="font-size:10px; font-weight:700; color:var(--purple); margin-top:4px; letter-spacing:1px; text-transform:uppercase;">Thought</div>
+            </div>
+          </div>
+
+          <div style="position:absolute; bottom:0; right:0;">
+            <div style="width:100px; height:100px; border-radius:50%; border:1.5px solid var(--accent); background:rgba(232,93,44,.07); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="font-size:24px;">⚡</div>
+              <div style="font-size:10px; font-weight:700; color:var(--accent); margin-top:4px; letter-spacing:1px; text-transform:uppercase;">Action</div>
+            </div>
+          </div>
+
+          <div style="position:absolute; bottom:0; left:0;">
+            <div style="width:100px; height:100px; border-radius:50%; border:1.5px solid var(--green); background:rgba(46,160,67,.07); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="font-size:24px;">👁</div>
+              <div style="font-size:10px; font-weight:700; color:var(--green); margin-top:4px; letter-spacing:1px; text-transform:uppercase;">Observe</div>
+            </div>
+          </div>
+
+          <div style="position:absolute; top:108px; right:24px; font-size:16px; color:var(--muted); transform:rotate(35deg);">↓</div>
+          <div style="position:absolute; bottom:52px; left:0; right:0; text-align:center; font-size:16px; color:var(--muted);">←</div>
+          <div style="position:absolute; top:108px; left:24px; font-size:16px; color:var(--muted); transform:rotate(-35deg);">↑</div>
+        </div>
+
+        <div style="margin-top:20px; font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase;">Loops until mission complete</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 9 — DRONE DECISION LOOP
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-7b">
+    <div class="eyebrow">How Each Drone Thinks</div>
+    <h2>The <span class="highlight2">6-Phase Decision Loop</span></h2>
+    <p style="margin-top:6px; text-align:center;">Every drone runs this cycle autonomously — from model load to action — then loops back indefinitely.</p>
+
+    <!-- 6 phase boxes -->
+    <div style="display:flex; align-items:stretch; gap:0; width:100%; max-width:1080px; margin-top:28px; position:relative;">
+
+      <!-- P1 -->
+      <div style="flex:1; background:#1a0a2e; border:1.5px solid #9d72ff; border-radius:10px 0 0 10px; padding:18px 14px; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:18px;">⚡</div>
+        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#9d72ff; font-weight:700;">Phase 1</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">Model Load</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-top:2px;">Init LLM client<br/>Log duration_ms</div>
+      </div>
+      <div style="display:flex; align-items:center; z-index:1; margin:0 -1px;">
+        <div style="width:22px; height:22px; background:#0e1117; border:1.5px solid #9d72ff; border-left:none; border-radius:0; clip-path:polygon(0 0,100% 50%,0 100%);"></div>
+      </div>
+
+      <!-- P2 -->
+      <div style="flex:1; background:#1a1000; border:1.5px solid #ff8c00; border-left:none; padding:18px 14px; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:18px;">📝</div>
+        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#ff8c00; font-weight:700;">Phase 2</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">System Prompt</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-top:2px;">Inject drone_id<br/>slot · sector · role<br/>battery rules</div>
+      </div>
+      <div style="display:flex; align-items:center; z-index:1; margin:0 -1px;">
+        <div style="width:22px; height:22px; background:#0e1117; border:1.5px solid #ff8c00; border-left:none; clip-path:polygon(0 0,100% 50%,0 100%);"></div>
+      </div>
+
+      <!-- P3 -->
+      <div style="flex:1; background:#001a0a; border:1.5px solid #00cc44; border-left:none; padding:18px 14px; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:18px;">📡</div>
+        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#00cc44; font-weight:700;">Phase 3</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">State Collect</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-top:2px;">Call MCP tools<br/>battery · position<br/>team status</div>
+      </div>
+      <div style="display:flex; align-items:center; z-index:1; margin:0 -1px;">
+        <div style="width:22px; height:22px; background:#0e1117; border:1.5px solid #00cc44; border-left:none; clip-path:polygon(0 0,100% 50%,0 100%);"></div>
+      </div>
+
+      <!-- P4 -->
+      <div style="flex:1; background:#1a0000; border:1.5px solid #ff4444; border-left:none; padding:18px 14px; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:18px;">🧠</div>
+        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#ff4444; font-weight:700;">Phase 4</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">Reasoning</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-top:2px;">LLM chain-of-thought<br/>Token streaming<br/>→ dashboard</div>
+      </div>
+      <div style="display:flex; align-items:center; z-index:1; margin:0 -1px;">
+        <div style="width:22px; height:22px; background:#0e1117; border:1.5px solid #ff4444; border-left:none; clip-path:polygon(0 0,100% 50%,0 100%);"></div>
+      </div>
+
+      <!-- P5 -->
+      <div style="flex:1; background:#00001a; border:1.5px solid #4444ff; border-left:none; padding:18px 14px; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:18px;">🔧</div>
+        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#4444ff; font-weight:700;">Phase 5</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">Tool Calls</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-top:2px;">Parse tool names<br/>Execute via MCP<br/>Retry w/ backoff</div>
+      </div>
+      <div style="display:flex; align-items:center; z-index:1; margin:0 -1px;">
+        <div style="width:22px; height:22px; background:#0e1117; border:1.5px solid #4444ff; border-left:none; clip-path:polygon(0 0,100% 50%,0 100%);"></div>
+      </div>
+
+      <!-- P6 -->
+      <div style="flex:1; background:#001a1a; border:1.5px solid #00cccc; border-left:none; border-radius:0 10px 10px 0; padding:18px 14px; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:18px;">📋</div>
+        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#00cccc; font-weight:700;">Phase 6</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">Decision</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-top:2px;">Log final action<br/>Post to X-Ray<br/>Advance round</div>
+      </div>
+
+    </div>
+
+    <!-- loop back arrow -->
+    <div style="width:100%; max-width:1080px; display:flex; align-items:flex-start; gap:0; margin-top:0; position:relative; height:36px;">
+      <!-- left anchor under P1 -->
+      <div style="flex:1; border-left:1.5px solid rgba(157,114,255,.4); border-bottom:1.5px solid rgba(157,114,255,.4); height:36px; border-radius:0 0 0 8px; margin-left:10%;"></div>
+      <!-- loop label -->
+      <div style="position:absolute; left:50%; transform:translateX(-50%); bottom:6px; font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; white-space:nowrap;">↺ &nbsp; next round — loops back to Phase 1</div>
+      <!-- right anchor under P6 -->
+      <div style="flex:1; border-right:1.5px solid rgba(157,114,255,.4); border-bottom:1.5px solid rgba(157,114,255,.4); height:36px; border-radius:0 0 8px 0; margin-right:10%;"></div>
+    </div>
+
+    <!-- bottom summary row -->
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; max-width:1080px; margin-top:18px;">
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 16px; text-align:center;">
+        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Runs per drone</div>
+        <div style="font-size:22px; font-weight:800; color:var(--purple);">∞</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">Continuous · until mission complete</div>
+      </div>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 16px; text-align:center;">
+        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">MCP calls per cycle</div>
+        <div style="font-size:22px; font-weight:800; color:var(--green);">3–6</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">Phase 3 + Phase 5 combined</div>
+      </div>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 16px; text-align:center;">
+        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Parallel drones</div>
+        <div style="font-size:22px; font-weight:800; color:var(--accent);">5 + 1</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">All running this loop simultaneously</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 9 — QWEN3 MANIFESTO
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-7">
+    <div style="position:absolute; width:600px; height:600px; background:radial-gradient(circle, rgba(46,160,67,.06) 0%, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1px 1fr; gap:0; width:100%; max-width:1000px; align-items:center; position:relative;">
+
+      <!-- LEFT — size comparison -->
+      <div style="padding-right:56px; display:flex; flex-direction:column; gap:20px;">
+
+        <div>
+          <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:16px;">One More Thing</div>
+          <div style="font-family:'Cascadia Code','Fira Code',monospace; font-size:clamp(22px,3vw,38px); font-weight:900; color:var(--text); letter-spacing:-1px; line-height:1.1; margin-bottom:6px;">qwen3:<span style="color:var(--green);">4b</span>-instruct</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:6px;">Best balance of size and performance — chosen after experimentation.</div>
+        </div>
+
+        <!-- bars -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+              <span style="font-size:12px; color:var(--muted);">DeepSeek V3</span>
+              <span style="font-size:12px; font-weight:800; color:var(--accent);">1,342 GB</span>
+            </div>
+            <div style="height:20px; border-radius:4px; overflow:hidden; background:rgba(232,93,44,.1); border:1px solid rgba(232,93,44,.2);">
+              <div style="height:100%; width:100%; background:linear-gradient(90deg,rgba(232,93,44,.6),rgba(255,140,64,.4));"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+              <span style="font-size:12px; font-weight:700; color:var(--green);">qwen3:4b — ours</span>
+              <span style="font-size:12px; font-weight:800; color:var(--green);">2.5 GB</span>
+            </div>
+            <div style="position:relative; height:20px; border-radius:4px; background:rgba(46,160,67,.06); border:1px solid rgba(46,160,67,.3);">
+              <div style="position:absolute; left:0; top:0; height:100%; width:0.19%; min-width:4px; background:var(--green); border-radius:4px;"></div>
+              <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:10px; color:rgba(46,160,67,.6);">← this sliver. runs on a laptop.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 500x -->
+        <div style="text-align:center; padding:16px; background:linear-gradient(135deg,rgba(46,160,67,.1),rgba(157,114,255,.08)); border:1px solid rgba(46,160,67,.3); border-radius:10px;">
+          <div style="font-size:58px; font-weight:900; line-height:1; background:linear-gradient(135deg,var(--green),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">500×</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px; letter-spacing:1px; text-transform:uppercase;">Smaller than DeepSeek V3</div>
+        </div>
+
+      </div>
+
+      <!-- divider -->
+      <div style="background:var(--border); height:65%; width:1px;"></div>
+
+      <!-- RIGHT — conviction -->
+      <div style="padding-left:56px; display:flex; flex-direction:column; gap:20px;">
+
+        <div style="background:rgba(232,93,44,.06); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:16px 18px;">
+          <div style="font-size:14px; font-weight:700; color:var(--text); line-height:1.6;">If we just used API calls to a large model, we would be lying to ourselves.</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="width:2px; min-height:36px; background:var(--green); flex-shrink:0; margin-top:3px;"></div>
+            <div style="font-size:13px; color:var(--muted); line-height:1.7;">With <strong style="color:var(--text);">proper skills and techniques</strong>, a small model can accomplish a specific task without relying on a large model.</div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start;">
+            <div style="width:2px; min-height:36px; background:var(--purple); flex-shrink:0; margin-top:3px;"></div>
+            <div style="font-size:13px; color:var(--muted); line-height:1.7;">5 drones. 600 survivors. Real GPS. <strong style="color:var(--text);">Zero cloud dependency.</strong></div>
+          </div>
+        </div>
+
+        <div style="border:1px solid rgba(46,160,67,.3); border-radius:10px; padding:16px 18px; margin-top:4px;">
+          <div style="font-size:13px; font-style:italic; color:var(--text); line-height:1.7;">"A small model with the right tools can accomplish what a model 500× its size cannot."</div>
+          <div style="font-size:10px; color:var(--green); margin-top:10px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700;">— The point of this entire project</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SLIDE 9 — SUMMARY
+  ═══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-8">
+    <div class="eyebrow">Summary</div>
+    <h2>What Makes This MCP Server <span class="highlight">Different</span></h2>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="s-icon">🗂️</div>
+        <div class="s-title">26 Tools, 4 Categories</div>
+        <div class="s-desc">Every tool serves a real operational need — from fleet discovery to simulation control. Zero filler.</div>
+      </div>
+      <div class="summary-card" style="border-color: rgba(232,93,44,.4);">
+        <div class="s-icon">🌡️</div>
+        <div class="s-title">thermal_scan</div>
+        <div class="s-desc">A real-time infrared sensor model exposed over MCP. The only way AI can see survivors. 100 m radius, critical triage flags, SQLite-backed.</div>
+      </div>
+      <div class="summary-card" style="border-color: rgba(157,114,255,.4);">
+        <div class="s-icon">👥</div>
+        <div class="s-title">Team Sector Sweep</div>
+        <div class="s-desc">Multi-agent consensus enforced at the server level. 5 drones, 5 sectors, automatic role-based ring assignment. No prompt engineering needed.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 28px; width: 100%; max-width: 1000px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; display: flex; gap: 48px; justify-content: center; align-items: center;">
+      <div style="text-align: center;">
+        <div style="font-size: 40px; font-weight: 700; color: var(--accent);">26</div>
+        <div style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Total Tools</div>
+      </div>
+      <div style="width: 1px; height: 48px; background: var(--border);"></div>
+      <div style="text-align: center;">
+        <div style="font-size: 40px; font-weight: 700; color: var(--purple);">4</div>
+        <div style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Categories</div>
+      </div>
+      <div style="width: 1px; height: 48px; background: var(--border);"></div>
+      <div style="text-align: center;">
+        <div style="font-size: 40px; font-weight: 700; color: var(--green);">2</div>
+        <div style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Unique / Mission-Critical</div>
+      </div>
+      <div style="width: 1px; height: 48px; background: var(--border);"></div>
+      <div style="text-align: center;">
+        <div style="font-size: 40px; font-weight: 700; color: var(--gold);">600</div>
+        <div style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Survivors to Rescue</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; font-size: 12px; color: var(--muted); font-family: monospace;">
+      Endpoint: <span style="color: var(--accent);">http://localhost:8766/sse</span>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<nav class="nav">
+  <button id="prev" disabled>← Prev</button>
+  <span class="counter" id="counter">1 / 11</span>
+  <button id="next">Next →</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const counter = document.getElementById('counter');
+  let current = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, slides.length - 1));
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+    counter.textContent = `${current + 1} / ${slides.length}`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1);
+  });
+</script>
+</body>
+</html>

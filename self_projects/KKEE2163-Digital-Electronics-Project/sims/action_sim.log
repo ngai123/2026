@@ -1,0 +1,36 @@
+==========================================================
+ tb_action_fsm : gesture scoring FSM simulation
+ CYCLES_PER_SEC = 1000 (1 sec = 10 us sim time)
+ Expected final_marks = 4 (1 throw + 2 pull + 1 turn)
+==========================================================
+[5000 ns] STATE 0 -> x
+      state = UNKNOWN(x)
+[15000 ns] STATE x -> 0
+[15000 ns] >>> SCORE updated: x -> 0
+      state = S_IDLE
+[20000 ns] SW0 -> 1 (start)
+[35000 ns] STATE 0 -> 1
+      state = S_INIT  (baseline calibrating, timer=4)
+[40035000 ns] STATE 1 -> 2
+      state = S_THROW (timer=8)
+[45020000 ns] entered gameplay; injecting THROW gesture
+[49035000 ns] >>> SCORE updated: 0 -> 1
+[120035000 ns] STATE 2 -> 3
+      state = S_PULL  (timer=8)
+[128020000 ns] injecting PULL gesture
+[128035000 ns] >>> SCORE updated: 1 -> 2
+[132035000 ns] >>> SCORE updated: 2 -> 3
+[200035000 ns] STATE 3 -> 4
+      state = S_TURN  (timer=8)
+[211020000 ns] injecting TURN gesture
+[215045000 ns] >>> SCORE updated: 3 -> 4
+[280035000 ns] STATE 4 -> 5
+      state = S_DONE
+----------------------------------------------------------
+ FINAL SCORE = 4
+----------------------------------------------------------
+ [PASS] score is 4 (1 throw + 2 pull + 1 turn).
+==========================================================
+ tb_action_fsm DONE
+==========================================================
+tb_action_fsm.v:169: $finish called at 299020000 (1ps)

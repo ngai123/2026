@@ -1,0 +1,27 @@
+# Vivado build artifacts
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.str
+*.dcp
+
+# Vivado logs and journals
+vivado*.jou
+vivado*.log
+vivado*.backup.*
+*.backup.jou
+*.backup.log
+hs_err_*.log
+dfx_runtime.txt
+
+# Xilinx intermediate files
+.Xil/
+*.pb
+*.wdf
+*.wpc
+
+# OS files
+.DS_Store
+Thumbs.db

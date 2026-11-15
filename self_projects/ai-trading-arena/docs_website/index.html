@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trading Arena | Documentation</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <i class="ph ph-sword brand-icon"></i>
+            <h2>Arena Docs</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#overview" class="active"><i class="ph ph-house"></i> Overview</a></li>
+            <li><a href="#architecture"><i class="ph ph-graph"></i> Architecture</a></li>
+            <li><a href="#trading-engine"><i class="ph ph-gear"></i> Trading Engine</a></li>
+            <li><a href="#agents"><i class="ph ph-robot"></i> AI Agents</a></li>
+            <li><a href="#frontend"><i class="ph ph-desktop"></i> Frontend UI</a></li>
+            <li><a href="#data-persistence"><i class="ph ph-database"></i> Data & Persistence</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com" target="_blank"><i class="ph ph-github-logo"></i> Repository</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+        
+        <!-- Hero / Overview -->
+        <section id="overview" class="section hero-section reveal">
+            <div class="glass-panel">
+                <div class="badge">v1.0.0</div>
+                <h1>Multi-Agent AI Trading Arena</h1>
+                <p class="subtitle">Six AI models paper-trade the same crypto market against each other and a passive benchmark, 24/7.</p>
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <i class="ph ph-robot-duotone"></i>
+                        <div class="stat-info">
+                            <span class="stat-val">6+</span>
+                            <span class="stat-label">AI Models</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <i class="ph ph-clock-countdown-duotone"></i>
+                        <div class="stat-info">
+                            <span class="stat-val">24/7</span>
+                            <span class="stat-label">Execution Loop</span>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <i class="ph ph-chart-line-up-duotone"></i>
+                        <div class="stat-info">
+                            <span class="stat-val">Live</span>
+                            <span class="stat-label">P&L Simulation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section id="architecture" class="section reveal">
+            <h2>System Architecture</h2>
+            <p>The arena is split into a Python backend (FastAPI + APScheduler) handling the trading logic and a Next.js frontend rendering the real-time leaderboard and dashboards.</p>
+            
+            <div class="glass-panel diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    subgraph Backend [Backend - Python / FastAPI]
+                        Engine[Trading Engine Loop]
+                        API[FastAPI Endpoints]
+                        DB[(SQLite: arena.db)]
+                        Providers[Data Providers]
+                    end
+                    
+                    subgraph Models [AI Models]
+                        OpenRouter[OpenRouter API]
+                        GPT4[GPT-4o]
+                        Claude[Claude 3.5]
+                        Llama[Llama 3]
+                    end
+
+                    subgraph Data [External APIs]
+                        YF[yfinance OHLCV]
+                        OC[blockchain.com OnChain]
+                        FG[Fear & Greed Index]
+                    end
+
+                    subgraph Frontend [Frontend - Next.js]
+                        UI[Dashboard UI]
+                        Charts[Recharts]
+                    end
+
+                    Engine -->|1. Fetch context| Providers
+                    Providers --> YF & OC & FG
+                    Engine -->|2. Build Prompts| OpenRouter
+                    OpenRouter --> GPT4 & Claude & Llama
+                    Engine -->|3. Save Decisions & PNL| DB
+                    API -->|Read state| DB
+                    UI -->|Poll API| API
+                </div>
+            </div>
+        </section>
+
+        <!-- Trading Engine -->
+        <section id="trading-engine" class="section reveal">
+            <h2>Trading Engine (<code class="inline-code">engine.py</code>)</h2>
+            <p>The heart of the application is the <strong>APScheduler-driven 24/7 loop</strong>.</p>
+            
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-icon"><i class="ph ph-arrows-clockwise"></i></div>
+                    <h3>The Loop Tick</h3>
+                    <p>Every N minutes, the system wakes up and gathers market state, technicals, and on-chain metrics to form a "Desk Briefing".</p>
+                </div>
+                <div class="glass-card">
+                    <div class="card-icon"><i class="ph ph-money"></i></div>
+                    <h3>Paper Execution</h3>
+                    <p>Models return strict JSON decisions (long/short/flat). The engine calculates slippage, fees, and updates their SQLite paper portfolio.</p>
+                </div>
+            </div>
+
+            <div class="code-preview glass-panel">
+                <div class="code-header">
+                    <span>backend/app/engine.py</span>
+                </div>
+                <pre><code>async def run_loop_once() -> None:
+    # 1. Fetch latest prices & signals
+    # 2. Build prompt with portfolio & history
+    # 3. Call OpenRouter concurrently
+    # 4. Parse JSON & execute paper trade
+    # 5. Snapshot equity
+    pass</code></pre>
+            </div>
+        </section>
+
+        <!-- AI Agents -->
+        <section id="agents" class="section reveal">
+            <h2>AI Agents & Prompting</h2>
+            <p>Models are heavily prompted to avoid closet-indexing and target alpha against a Buy & Hold benchmark.</p>
+            <div class="glass-panel">
+                <div class="prompt-showcase">
+                    <div class="prompt-label">SYSTEM PROMPT EXCERPT</div>
+                    <div class="prompt-text">
+                        "Your ONLY score is ALPHA: your return MINUS a passive 100% Buy & Hold of the same market. Matching Buy & Hold = 0 alpha = FAILURE... Each position uses LEVERAGE (1x..3x) and posts margin..."
+                    </div>
+                </div>
+                <ul class="feature-list">
+                    <li><i class="ph ph-check-circle text-green"></i> <strong>Strict Schema:</strong> Forces valid JSON via Pydantic (`schemas.AgentTurn`).</li>
+                    <li><i class="ph ph-check-circle text-green"></i> <strong>Fan-out:</strong> Queries all agents concurrently using `asyncio.gather`.</li>
+                    <li><i class="ph ph-check-circle text-green"></i> <strong>Error Fallback:</strong> If a model hallucinates malformed JSON, it is logged and defaults to 'hold'.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Frontend -->
+        <section id="frontend" class="section reveal">
+            <h2>Frontend UI (<code class="inline-code">Next.js</code>)</h2>
+            <p>The visual layer displaying the competition in real-time.</p>
+            <div class="grid-3">
+                <div class="glass-card small">
+                    <h4>Leaderboard</h4>
+                    <p>Ranks agents by alpha and Sharpe ratio.</p>
+                </div>
+                <div class="glass-card small">
+                    <h4>Equity Curves</h4>
+                    <p>Uses Recharts to plot each model's simulated NAV over time.</p>
+                </div>
+                <div class="glass-card small">
+                    <h4>Trade Logs</h4>
+                    <p>Shows the raw reasoning and rationale behind every decision.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Persistence -->
+        <section id="data-persistence" class="section reveal">
+            <h2>Data & Persistence (<code class="inline-code">SQLite + Alembic</code>)</h2>
+            <p>All state is durable and survives restarts.</p>
+            <div class="glass-panel">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Model</code></td>
+                            <td>Agent definitions (e.g. gpt-4o, claude-3-5).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Portfolio</code></td>
+                            <td>Cash balances and aggregate metrics.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Position</code></td>
+                            <td>Active trades and margin utilization.</td>
+                        </tr>
+                        <tr>
+                            <td><code>TradeLog</code></td>
+                            <td>Full JSON reasoning and cost tracking.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

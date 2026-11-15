@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KKEE2163 Digital Electronics Project — Documentation</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #334155;
+    --accent1: #38bdf8; /* sky */
+    --accent2: #a78bfa; /* violet */
+    --accent3: #34d399; /* emerald */
+    --accent4: #fb923c; /* orange */
+    --accent5: #f472b6; /* pink */
+    --accent6: #facc15; /* yellow */
+    --text: #e2e8f0;
+    --textdim: #94a3b8;
+    --border: #475569;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1a1040 100%);
+    padding: 60px 40px;
+    text-align: center;
+    border-bottom: 3px solid var(--accent1);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(56,189,248,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(167,139,250,0.08) 0%, transparent 50%);
+    animation: pulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes pulse { 0%{opacity:.5} 100%{opacity:1} }
+  .hero h1 { font-size: 2.8em; font-weight: 800; position:relative;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 1.2em; color: var(--textdim); margin-top: 10px; position:relative; }
+  .hero .badge { display:inline-block; margin-top:16px; padding:6px 18px; border-radius:20px;
+    background: rgba(56,189,248,0.15); border:1px solid var(--accent1); color:var(--accent1);
+    font-size:0.9em; position:relative; }
+
+  /* --- Container --- */
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+  /* --- Section --- */
+  .section { margin-bottom: 60px; }
+  .section-title {
+    font-size: 1.8em; font-weight: 700; margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title .icon { font-size: 1.2em; }
+
+  /* --- Mind Map --- */
+  .mindmap-wrap { overflow-x: auto; padding: 20px 0; }
+  .mindmap {
+    width: 100%; min-width: 900px;
+  }
+  .mindmap text { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  /* --- Cards --- */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+  .card h3 { font-size: 1.15em; margin-bottom: 8px; display:flex; align-items:center; gap:8px; }
+  .card p, .card ul { color: var(--textdim); font-size: 0.95em; }
+  .card ul { padding-left: 20px; }
+  .card ul li { margin: 4px 0; }
+  .card .tag {
+    display:inline-block; padding:2px 10px; border-radius:12px;
+    font-size:0.8em; font-weight:600; margin-right:6px;
+  }
+
+  /* Color tags */
+  .tag-sky { background:rgba(56,189,248,0.2); color:var(--accent1); }
+  .tag-violet { background:rgba(167,139,250,0.2); color:var(--accent2); }
+  .tag-emerald { background:rgba(52,211,153,0.2); color:var(--accent3); }
+  .tag-orange { background:rgba(251,146,60,0.2); color:var(--accent4); }
+  .tag-pink { background:rgba(244,114,182,0.2); color:var(--accent5); }
+  .tag-yellow { background:rgba(250,204,21,0.2); color:var(--accent6); }
+
+  /* --- Flow diagram --- */
+  .flow-svg { width: 100%; }
+
+  /* --- State machine --- */
+  .state-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+  .state-step {
+    display: flex; align-items: stretch; gap: 0;
+  }
+  .state-line {
+    width: 60px; display: flex; flex-direction: column; align-items: center; flex-shrink:0;
+  }
+  .state-dot {
+    width: 32px; height: 32px; border-radius: 50%; display:flex; align-items:center; justify-content:center;
+    font-weight: 700; font-size: 0.85em; flex-shrink: 0; z-index: 1;
+  }
+  .state-bar {
+    width: 3px; flex: 1; min-height: 20px;
+  }
+  .state-content {
+    flex: 1; padding: 12px 20px; margin-bottom: 8px;
+    border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card);
+  }
+  .state-content h4 { font-size: 1.05em; margin-bottom: 4px; }
+  .state-content .meta { font-size: 0.85em; color: var(--textdim); }
+  .state-content .desc { margin-top: 8px; font-size: 0.92em; color: var(--textdim); }
+
+  /* --- Sprite comparison --- */
+  .sprite-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .sprite-card {
+    background: var(--card);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .sprite-card:hover { transform: scale(1.03); }
+  .sprite-canvas-wrap {
+    background: #000;
+    padding: 8px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 180px;
+  }
+  .sprite-canvas-wrap canvas { image-rendering: pixelated; }
+  .sprite-info { padding: 14px; }
+  .sprite-info h4 { font-size: 1em; }
+  .sprite-info .stat { font-size: 0.85em; color: var(--textdim); margin-top: 4px; }
+  .sprite-label {
+    display:inline-block; padding:3px 12px; border-radius: 8px 8px 0 0;
+    font-weight:700; font-size:0.85em; width:100%;
+  }
+
+  /* --- Table --- */
+  .styled-table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 0.92em;
+  }
+  .styled-table th {
+    background: var(--card2); padding: 12px 16px;
+    text-align: left; font-weight: 600;
+    border-bottom: 2px solid var(--accent1);
+  }
+  .styled-table td {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+  }
+  .styled-table tr:hover td { background: rgba(56,189,248,0.05); }
+
+  /* --- Scoring visual --- */
+  .scoring-block {
+    background: var(--card); border-radius: 14px; padding: 28px;
+    margin-bottom: 20px; border-left: 4px solid;
+  }
+  .scoring-block h4 { font-size: 1.1em; margin-bottom: 10px; }
+  .scoring-block .wave { font-family: monospace; font-size: 0.9em; line-height: 1.3;
+    background: var(--bg); padding: 16px; border-radius: 8px; margin-top: 12px;
+    overflow-x: auto; white-space: pre; }
+
+  /* --- Pin map visual --- */
+  .pin-group { margin-bottom: 20px; }
+  .pin-group h4 { margin-bottom: 8px; display:flex; align-items:center; gap:8px; }
+  .pin-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pin-pill {
+    padding: 4px 12px; border-radius: 8px; font-size: 0.82em;
+    font-family: 'Courier New', monospace; font-weight: 600;
+  }
+
+  /* --- Audio visual --- */
+  .note-bar {
+    display: inline-block; border-radius: 4px; margin: 2px;
+    text-align: center; font-size: 0.75em; font-weight: 700;
+    color: #000; vertical-align: bottom;
+  }
+
+  /* --- Timeline --- */
+  .timeline-bar {
+    display: flex; border-radius: 12px; overflow: hidden; height: 56px;
+    margin: 20px 0; font-size: 0.85em; font-weight: 600;
+  }
+  .timeline-bar > div {
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 2px;
+  }
+  .timeline-bar .tl-label { font-size: 0.75em; opacity: 0.8; }
+
+  /* --- Collapsible --- */
+  details { margin: 12px 0; }
+  details summary {
+    cursor: pointer; padding: 12px 16px;
+    background: var(--card); border-radius: 10px;
+    font-weight: 600; border: 1px solid var(--border);
+    transition: background 0.2s;
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: '▶ '; font-size: 0.8em; }
+  details[open] summary::before { content: '▼ '; }
+  details[open] summary { border-radius: 10px 10px 0 0; background: var(--card2); }
+  details .detail-body {
+    padding: 20px; background: var(--card);
+    border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 10px 10px;
+  }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8em; }
+    .sprite-row { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <h1>KKEE2163 Digital Electronics Project</h1>
+  <p>Accelerometer Gesture Game on Nexys A7-100T FPGA</p>
+  <div class="badge">Xilinx Artix-7 &bull; Verilog &bull; VGA &bull; SPI &bull; PWM Audio</div>
+</div>
+
+<div class="container">
+
+<!-- ==================== 1. SYSTEM MIND MAP ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🧠</span> System Mind Map</div>
+  <div class="mindmap-wrap">
+    <svg class="mindmap" viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background grid -->
+      <defs>
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient>
+        <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient>
+        <linearGradient id="g3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#f472b6"/></linearGradient>
+        <linearGradient id="g4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#f472b6"/></linearGradient>
+        <linearGradient id="g5" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#fb923c"/></linearGradient>
+      </defs>
+
+      <!-- Center node -->
+      <rect x="430" y="260" width="240" height="70" rx="35" fill="url(#g1)" filter="url(#glow)"/>
+      <text x="550" y="300" text-anchor="middle" fill="#0f172a" font-size="17" font-weight="800">master_game_top</text>
+      <text x="550" y="318" text-anchor="middle" fill="#1e293b" font-size="11">Top-Level Module</text>
+
+      <!-- Branch lines -->
+      <!-- Clock branch (top-left) -->
+      <path d="M430,280 C350,280 300,140 220,140" stroke="url(#g2)" stroke-width="3" fill="none"/>
+      <path d="M220,140 C180,140 150,80 100,80" stroke="#34d399" stroke-width="2" fill="none"/>
+      <path d="M220,140 C180,140 150,200 100,200" stroke="#38bdf8" stroke-width="2" fill="none"/>
+
+      <!-- Clock nodes -->
+      <rect x="130" y="115" width="180" height="50" rx="25" fill="#1e3a3a" stroke="#34d399" stroke-width="2"/>
+      <text x="220" y="143" text-anchor="middle" fill="#34d399" font-size="13" font-weight="700">iclk_gen</text>
+      <text x="220" y="157" text-anchor="middle" fill="#94a3b8" font-size="10">100→4 MHz</text>
+
+      <rect x="10" y="55" width="170" height="50" rx="25" fill="#1e3a3a" stroke="#34d399" stroke-width="2"/>
+      <text x="95" y="78" text-anchor="middle" fill="#34d399" font-size="12" font-weight="700">CLK100MHZ</text>
+      <text x="95" y="93" text-anchor="middle" fill="#94a3b8" font-size="10">100 MHz Crystal</text>
+
+      <rect x="10" y="175" width="170" height="50" rx="25" fill="#1e2a3a" stroke="#38bdf8" stroke-width="2"/>
+      <text x="95" y="198" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="700">spi_master</text>
+      <text x="95" y="213" text-anchor="middle" fill="#94a3b8" font-size="10">ADXL362 SPI Driver</text>
+
+      <!-- SPI to Accel -->
+      <path d="M10,200 C-20,200 -20,200 -10,200" stroke="#38bdf8" stroke-width="2" fill="none"/>
+
+      <!-- Scoring branch (bottom-left) -->
+      <path d="M430,310 C350,310 300,420 220,420" stroke="url(#g3)" stroke-width="3" fill="none"/>
+      <path d="M220,420 C170,420 140,370 80,370" stroke="#fb923c" stroke-width="2" fill="none"/>
+      <path d="M220,420 C170,420 140,470 80,470" stroke="#f472b6" stroke-width="2" fill="none"/>
+
+      <rect x="130" y="395" width="180" height="50" rx="25" fill="#3a2a1e" stroke="#fb923c" stroke-width="2"/>
+      <text x="220" y="418" text-anchor="middle" fill="#fb923c" font-size="13" font-weight="700">action_fsm</text>
+      <text x="220" y="433" text-anchor="middle" fill="#94a3b8" font-size="10">Game Logic + Scoring</text>
+
+      <rect x="0" y="345" width="160" height="50" rx="25" fill="#3a2a1e" stroke="#fb923c" stroke-width="2"/>
+      <text x="80" y="368" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="600">Score [7:0]</text>
+      <text x="80" y="383" text-anchor="middle" fill="#94a3b8" font-size="10">+ Timer [3:0]</text>
+
+      <rect x="0" y="445" width="160" height="50" rx="25" fill="#3a1e2a" stroke="#f472b6" stroke-width="2"/>
+      <text x="80" y="468" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="600">seg7_control</text>
+      <text x="80" y="483" text-anchor="middle" fill="#94a3b8" font-size="10">7-Segment Display</text>
+
+      <!-- VGA branch (top-right) -->
+      <path d="M670,280 C750,280 800,160 880,160" stroke="url(#g4)" stroke-width="3" fill="none"/>
+      <path d="M880,160 C920,160 940,90 980,90" stroke="#a78bfa" stroke-width="2" fill="none"/>
+      <path d="M880,160 C920,160 940,160 980,160" stroke="#f472b6" stroke-width="2" fill="none"/>
+      <path d="M880,160 C920,160 940,230 980,230" stroke="#a78bfa" stroke-width="2" fill="none"/>
+
+      <rect x="790" y="135" width="180" height="50" rx="25" fill="#2a1e3a" stroke="#a78bfa" stroke-width="2"/>
+      <text x="880" y="158" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">VGA_TEST</text>
+      <text x="880" y="173" text-anchor="middle" fill="#94a3b8" font-size="10">VGA Top Module</text>
+
+      <rect x="930" y="65" width="160" height="50" rx="25" fill="#2a1e3a" stroke="#a78bfa" stroke-width="2"/>
+      <text x="1010" y="88" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="600">VGA</text>
+      <text x="1010" y="103" text-anchor="middle" fill="#94a3b8" font-size="10">640×480 Timing</text>
+
+      <rect x="930" y="135" width="160" height="50" rx="25" fill="#2a1e3a" stroke="#f472b6" stroke-width="2"/>
+      <text x="1010" y="155" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="600">IMAGE_ROM ×9</text>
+      <text x="1010" y="170" text-anchor="middle" fill="#94a3b8" font-size="10">Sprite BRAM</text>
+
+      <rect x="930" y="205" width="160" height="50" rx="25" fill="#2a1e3a" stroke="#a78bfa" stroke-width="2"/>
+      <text x="1010" y="228" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="600">UI_TEXT_ENGINE</text>
+      <text x="1010" y="243" text-anchor="middle" fill="#94a3b8" font-size="10">8×8 Font Renderer</text>
+
+      <!-- Audio branch (bottom-right) -->
+      <path d="M670,310 C750,310 800,440 880,440" stroke="url(#g5)" stroke-width="3" fill="none"/>
+      <path d="M880,440 C920,440 940,400 980,400" stroke="#facc15" stroke-width="2" fill="none"/>
+      <path d="M880,440 C920,440 940,480 980,480" stroke="#fb923c" stroke-width="2" fill="none"/>
+
+      <rect x="790" y="415" width="180" height="50" rx="25" fill="#3a3a1e" stroke="#facc15" stroke-width="2"/>
+      <text x="880" y="438" text-anchor="middle" fill="#facc15" font-size="12" font-weight="700">audio_processor</text>
+      <text x="880" y="453" text-anchor="middle" fill="#94a3b8" font-size="10">PWM Audio Engine</text>
+
+      <rect x="930" y="375" width="160" height="50" rx="25" fill="#3a3a1e" stroke="#facc15" stroke-width="2"/>
+      <text x="1010" y="398" text-anchor="middle" fill="#facc15" font-size="11" font-weight="600">note_gen ×2</text>
+      <text x="1010" y="413" text-anchor="middle" fill="#94a3b8" font-size="10">Square Wave Osc</text>
+
+      <rect x="930" y="455" width="160" height="50" rx="25" fill="#3a2a1e" stroke="#fb923c" stroke-width="2"/>
+      <text x="1010" y="478" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="600">Drum Channel</text>
+      <text x="1010" y="493" text-anchor="middle" fill="#94a3b8" font-size="10">Noise Percussion</text>
+
+      <!-- Output labels -->
+      <!-- LEDs -->
+      <path d="M550,330 C550,380 550,520 550,540" stroke="#64748b" stroke-width="2" fill="none" stroke-dasharray="6,4"/>
+      <rect x="475" y="540" width="150" height="44" rx="22" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+      <text x="550" y="560" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="600">LED [14:0]</text>
+      <text x="550" y="575" text-anchor="middle" fill="#64748b" font-size="10">Raw Accel Data</text>
+
+      <!-- SW0 input -->
+      <rect x="460" y="190" width="180" height="44" rx="22" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+      <text x="550" y="210" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="600">SW0 (J15)</text>
+      <text x="550" y="225" text-anchor="middle" fill="#64748b" font-size="10">Start / Reset Switch</text>
+      <path d="M550,234 L550,260" stroke="#64748b" stroke-width="2" fill="none"/>
+      <polygon points="550,260 545,252 555,252" fill="#64748b"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ==================== 2. HARDWARE OVERVIEW ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🔌</span> Hardware Overview</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3><span class="tag tag-sky">FPGA</span> Nexys A7-100T</h3>
+      <ul>
+        <li>Xilinx Artix-7 XC7A100T</li>
+        <li>100 MHz on-board oscillator</li>
+        <li>15,850 slices / 4,860 Kbit BRAM</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-emerald">SENSOR</span> ADXL362 Accelerometer</h3>
+      <ul>
+        <li>3-axis (X, Y, Z) measurement</li>
+        <li>SPI interface @ 1 MHz</li>
+        <li>~100 Hz sample rate</li>
+        <li>Sign + 4-bit magnitude per axis</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-violet">DISPLAY</span> VGA Monitor</h3>
+      <ul>
+        <li>640×480 @ 60 Hz standard</li>
+        <li>12-bit color (4096 colors)</li>
+        <li>160×120 sprites scaled 4×</li>
+        <li>8×8 bitmap font engine</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-orange">AUDIO</span> PWM Amplifier</h3>
+      <ul>
+        <li>On-board mono amplifier</li>
+        <li>Clock-divider square wave tones</li>
+        <li>3-channel mixer (melody + SFX + drum)</li>
+        <li>2-bit PWM DAC</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-pink">INPUT</span> Controls</h3>
+      <ul>
+        <li><strong>SW0 (J15)</strong> — Start/reset game</li>
+        <li><strong>CPU Reset (C12)</strong> — Reset VGA & audio</li>
+        <li>Physical board motion = gesture input</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-yellow">OUTPUT</span> Indicators</h3>
+      <ul>
+        <li>15 LEDs: raw X/Y/Z accel data</li>
+        <li>8-digit 7-segment: score + countdown</li>
+        <li>Score on AN0-AN1, Timer on AN6-AN7</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 3. GAME TIMELINE ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">⏱️</span> Game Timeline (28 Seconds Total)</div>
+  <div class="timeline-bar">
+    <div style="flex:4; background:linear-gradient(135deg,#475569,#64748b);">
+      <span>INIT</span>
+      <span class="tl-label">4 sec</span>
+    </div>
+    <div style="flex:8; background:linear-gradient(135deg,#dc2626,#ef4444);">
+      <span>🤾 THROW</span>
+      <span class="tl-label">8 sec</span>
+    </div>
+    <div style="flex:8; background:linear-gradient(135deg,#2563eb,#3b82f6);">
+      <span>💪 PULL</span>
+      <span class="tl-label">8 sec</span>
+    </div>
+    <div style="flex:8; background:linear-gradient(135deg,#16a34a,#22c55e);">
+      <span>🔄 TURN</span>
+      <span class="tl-label">8 sec</span>
+    </div>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:0.85em; color:var(--textdim); padding:0 4px;">
+    <span>0s</span><span>4s</span><span>12s</span><span>20s</span><span>28s</span>
+  </div>
+</div>
+
+<!-- ==================== 4. STATE MACHINE ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🔄</span> Game State Machine</div>
+
+  <div class="state-grid">
+    <!-- IDLE -->
+    <div class="state-step">
+      <div class="state-line">
+        <div class="state-dot" style="background:#64748b; color:#fff;">0</div>
+        <div class="state-bar" style="background:linear-gradient(#64748b, #475569);"></div>
+      </div>
+      <div class="state-content" style="border-left:3px solid #64748b;">
+        <h4 style="color:#94a3b8;">S_IDLE — Waiting</h4>
+        <div class="meta">Duration: Until SW0 flipped ON</div>
+        <div class="desc">
+          <strong>VGA:</strong> "PRESS BUTTON TO START" (white text on black)<br>
+          <strong>Audio:</strong> Silence<br>
+          <strong>Action:</strong> Score = 0, baselines snap to live accelerometer reading<br>
+          <span class="tag tag-sky" style="margin-top:6px;">SW0 = 1 → advance to INIT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INIT -->
+    <div class="state-step">
+      <div class="state-line">
+        <div class="state-dot" style="background:#475569; color:#fff;">1</div>
+        <div class="state-bar" style="background:linear-gradient(#475569, #dc2626);"></div>
+      </div>
+      <div class="state-content" style="border-left:3px solid #475569;">
+        <h4 style="color:#94a3b8;">S_INIT — Countdown</h4>
+        <div class="meta">Duration: 4 seconds | 7-Seg Timer: 4→3→2→1</div>
+        <div class="desc">
+          <strong>VGA:</strong> Big "3" → "2" → "1" → "START"<br>
+          <strong>Audio:</strong> Beep tick each second (1 kHz, 25ms burst)<br>
+          <strong>⚠️ KEEP BOARD STILL</strong> — baselines are calibrating to gravity offset
+        </div>
+      </div>
+    </div>
+
+    <!-- THROW -->
+    <div class="state-step">
+      <div class="state-line">
+        <div class="state-dot" style="background:#dc2626; color:#fff;">2</div>
+        <div class="state-bar" style="background:linear-gradient(#dc2626, #2563eb);"></div>
+      </div>
+      <div class="state-content" style="border-left:3px solid #dc2626;">
+        <h4 style="color:#ef4444;">S_THROW — Throw Phase</h4>
+        <div class="meta">Duration: 8 seconds | Sprite: throw_1 → throw_2 → throw_3 @ 6 FPS</div>
+        <div class="desc">
+          <strong>Scoring:</strong> Z-spike <em>arms</em> → then X-spike <em>scores</em> (threshold ≥ 5)<br>
+          <strong>Audio:</strong> Ode to Joy build-up melody (250ms/beat)<br>
+          <strong>Cooldown:</strong> 0.25 sec between points
+        </div>
+      </div>
+    </div>
+
+    <!-- PULL -->
+    <div class="state-step">
+      <div class="state-line">
+        <div class="state-dot" style="background:#2563eb; color:#fff;">3</div>
+        <div class="state-bar" style="background:linear-gradient(#2563eb, #16a34a);"></div>
+      </div>
+      <div class="state-content" style="border-left:3px solid #2563eb;">
+        <h4 style="color:#3b82f6;">S_PULL — Pull Phase</h4>
+        <div class="meta">Duration: 8 seconds | Sprite: pull_1 → pull_2 → pull_3 @ 6 FPS</div>
+        <div class="desc">
+          <strong>Scoring:</strong> X deviation spike ≥ 2 from baseline (either direction)<br>
+          <strong>Audio:</strong> Build-up melody continues<br>
+          <strong>Easiest phase</strong> — lowest detection threshold
+        </div>
+      </div>
+    </div>
+
+    <!-- TURN -->
+    <div class="state-step">
+      <div class="state-line">
+        <div class="state-dot" style="background:#16a34a; color:#fff;">4</div>
+        <div class="state-bar" style="background:linear-gradient(#16a34a, #facc15);"></div>
+      </div>
+      <div class="state-content" style="border-left:3px solid #16a34a;">
+        <h4 style="color:#22c55e;">S_TURN — Turn Phase</h4>
+        <div class="meta">Duration: 8 seconds | Sprite: turn_1 → turn_2 → turn_3 @ 6 FPS</div>
+        <div class="desc">
+          <strong>Scoring:</strong> Y/Z sign flips counted — every 2 flips = 1 point (mag ≥ 4 gate)<br>
+          <strong>Audio:</strong> Build-up melody continues<br>
+          <strong>Rotate the board</strong> back and forth to trigger sign changes
+        </div>
+      </div>
+    </div>
+
+    <!-- DONE -->
+    <div class="state-step">
+      <div class="state-line">
+        <div class="state-dot" style="background:#facc15; color:#000;">5</div>
+        <div class="state-bar" style="background:#facc15; height:8px;"></div>
+      </div>
+      <div class="state-content" style="border-left:3px solid #facc15;">
+        <h4 style="color:#facc15;">S_DONE — Result Screen</h4>
+        <div class="meta">Duration: Indefinite (flip SW0 OFF to reset)</div>
+        <div class="desc">
+          <strong>VGA:</strong> "RESULT" + "SCORE: XX" (yellow text)<br>
+          <strong>Audio:</strong> Victory arpeggio (C4→E4→G4→C5 loop)<br>
+          <strong>Score frozen</strong> on both VGA and 7-segment display
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px; padding:16px; background:var(--card); border-radius:12px; border:1px solid var(--border);">
+    <strong style="color:var(--accent4);">↩️ Global Reset:</strong>
+    <span style="color:var(--textdim);">Flipping SW0 OFF from <em>any</em> state instantly jumps back to S_IDLE, clearing score and all timers.</span>
+  </div>
+</div>
+
+<!-- ==================== NEW: SPI MASTER & ACTION FSM — COMPLETE ONE-STOP DEEP DIVE ==================== -->
+<div class="section" id="spi-action-deepdive">
+  <div class="section-title"><span class="icon">🔬</span> SPI Master & Action FSM — Complete Deep Dive (One-Stop Reference)</div>
+  <p style="color:var(--accent6); font-weight:600; margin-bottom:20px; font-size:1.05em;">
+    ⭐ This section contains <em>everything</em> you need to understand about <code>spi_master.v</code> and <code>action_fsm.v</code>. 
+    No need to look anywhere else — all code logic, timing math, state machines, data flow, testbenches, simulation results, and explanations are consolidated here.
+  </p>
+
+  <!-- ===== TABLE OF CONTENTS ===== -->
+  <div style="background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--accent1); margin-bottom:32px;">
+    <h4 style="color:var(--accent1); margin-bottom:12px;">📑 Section Contents</h4>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; font-size:0.92em;">
+      <div style="color:var(--textdim);">A. SPI Master — Module Overview & Ports</div>
+      <div style="color:var(--textdim);">G. Action FSM — Module Overview & Ports</div>
+      <div style="color:var(--textdim);">B. SPI Clock Derivation (4 MHz → 1 MHz)</div>
+      <div style="color:var(--textdim);">H. Action FSM — 6-State Machine</div>
+      <div style="color:var(--textdim);">C. SPI 93-State Machine — Complete Map</div>
+      <div style="color:var(--textdim);">I. Self-Calibrating Baseline System</div>
+      <div style="color:var(--textdim);">D. SPI Write Transaction (Init Sensor)</div>
+      <div style="color:var(--textdim);">J. Scoring Algorithms (All 3 Phases)</div>
+      <div style="color:var(--textdim);">E. SPI Read Transaction (6-Byte Burst)</div>
+      <div style="color:var(--textdim);">K. Timing & Counter Math</div>
+      <div style="color:var(--textdim);">F. Data Packing (16-bit → 5-bit per axis)</div>
+      <div style="color:var(--textdim);">L. Simulation Results & Waveform Analysis</div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART A: SPI MASTER — MODULE OVERVIEW                             -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(56,189,248,0.08), rgba(52,211,153,0.08)); border-radius:16px; padding:28px; border:2px solid var(--accent1); margin-bottom:28px;">
+    <h3 style="color:var(--accent1); font-size:1.3em; margin-bottom:16px;">A. SPI Master — Module Overview & Ports</h3>
+    
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-bottom:16px;">
+      <h4 style="color:var(--accent3); margin-bottom:8px;">What is spi_master?</h4>
+      <p style="color:var(--textdim);">
+        <code>spi_master.v</code> is a <strong>bit-banging SPI controller</strong> that communicates with the <strong>ADXL362 3-axis accelerometer</strong> on the Nexys A7 board. 
+        It implements SPI Mode 0 (CPOL=0, CPHA=0) — meaning the clock idles LOW, and data is sampled on the <em>rising</em> edge of SCLK. 
+        The module uses a <strong>93-state FSM</strong> driven by a global tick counter to manage every single SPI bit transition manually.
+        There is no shift register or generic SPI engine — each bit sent/received gets its own dedicated FSM state.
+      </p>
+    </div>
+
+    <h4 style="margin-bottom:12px;">Port Interface</h4>
+    <table class="styled-table">
+      <thead>
+        <tr><th>Port</th><th>Dir</th><th>Width</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:var(--accent1); font-weight:600;">iclk</td><td>Input</td><td>1</td><td>4 MHz master clock (from <code>iclk_gen</code>). All FSM state transitions are synchronized to this.</td></tr>
+        <tr><td style="color:var(--accent1); font-weight:600;">miso</td><td>Input</td><td>1</td><td>Master-In Slave-Out. Data line FROM the ADXL362 accelerometer TO the FPGA.</td></tr>
+        <tr><td style="color:var(--accent3); font-weight:600;">sclk</td><td>Output</td><td>1</td><td>SPI serial clock (1 MHz, gated). Only toggles when <code>sclk_control=1</code>.</td></tr>
+        <tr><td style="color:var(--accent3); font-weight:600;">mosi</td><td>Output</td><td>1</td><td>Master-Out Slave-In. Data line FROM FPGA TO accelerometer. Drives command/address bytes.</td></tr>
+        <tr><td style="color:var(--accent3); font-weight:600;">cs</td><td>Output</td><td>1</td><td>Chip Select (active LOW). Pulled low to start SPI transaction, high to end.</td></tr>
+        <tr><td style="color:var(--accent4); font-weight:600;">acl_data</td><td>Output</td><td>15</td><td>Packed accelerometer data: <code>{X[11:7], Y[11:7], Z[11:7]}</code> = sign + 4-bit magnitude per axis.</td></tr>
+      </tbody>
+    </table>
+
+    <div style="background:var(--bg); border-radius:10px; padding:16px; margin-top:16px;">
+      <h4 style="color:var(--accent6); margin-bottom:8px;">How It Connects in the System</h4>
+      <div style="font-family:monospace; font-size:0.88em; color:var(--textdim); line-height:1.6;">
+CLK100MHZ ──► iclk_gen ──► 4 MHz (iclk) ──► spi_master ──► acl_data[14:0] ──► action_fsm<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► mosi ──► ADXL362<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► sclk ──► ADXL362<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► cs ────► ADXL362<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──◄ miso ◄── ADXL362
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART B: SPI CLOCK DERIVATION                                     -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(52,211,153,0.08), rgba(56,189,248,0.08)); border-radius:16px; padding:28px; border:2px solid var(--accent3); margin-bottom:28px;">
+    <h3 style="color:var(--accent3); font-size:1.3em; margin-bottom:16px;">B. SPI Clock Derivation — 4 MHz → 1 MHz SCLK</h3>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+      <div style="background:var(--card); border-radius:12px; padding:20px;">
+        <h4 style="color:var(--accent3); margin-bottom:8px;">Step 1: 100 MHz → 4 MHz (iclk_gen.v)</h4>
+        <p style="color:var(--textdim); font-size:0.9em;">
+          The board provides 100 MHz. <code>iclk_gen</code> divides by 25 to get 4 MHz.<br><br>
+          <strong>Math:</strong> 100 MHz / 4 MHz = 25 ticks per period.<br>
+          Since 25 is odd, a 50/50 duty cycle is impossible. Solution: toggle at tick 13 and 25,
+          giving 13 HIGH + 12 LOW = 52% duty cycle (close enough for SPI).
+        </p>
+        <div style="font-family:monospace; font-size:0.82em; margin-top:12px; background:var(--bg); padding:12px; border-radius:8px; color:var(--accent3);">
+counter: 0─1─2─...─12─13─14─...─24─0─1<br>
+clk_reg: ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░▓▓<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│←── 13 HIGH ──►│◄─ 12 LOW ─►│
+        </div>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:20px;">
+        <h4 style="color:var(--accent1); margin-bottom:8px;">Step 2: 4 MHz → 1 MHz (Inside spi_master.v)</h4>
+        <p style="color:var(--textdim); font-size:0.9em;">
+          Inside <code>spi_master</code>, a 1-bit counter (<code>clk_counter</code>) divides by 4:<br><br>
+          <strong>Math:</strong> 4 MHz / (2 × 2) = 1 MHz. The counter flips every 2 iclk ticks.<br>
+          This 1 MHz signal (<code>clk_reg</code>) is <strong>gated</strong> by <code>sclk_control</code>:
+        </p>
+        <div style="font-family:monospace; font-size:0.82em; margin-top:12px; background:var(--bg); padding:12px; border-radius:8px; color:var(--accent1);">
+assign sclk = sclk_control ? clk_reg : 0;<br><br>
+When sclk_control = 0: SCLK stuck LOW (idle)<br>
+When sclk_control = 1: SCLK = 1 MHz toggle
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px;">
+      <h4 style="color:var(--accent6); margin-bottom:8px;">Why 4 Ticks Per SPI Bit?</h4>
+      <p style="color:var(--textdim); font-size:0.9em;">
+        Each SPI bit takes <strong>4 iclk ticks</strong> (= 1 µs at 4 MHz = one period of the 1 MHz SCLK).<br>
+        The FSM advances states every 4 counter ticks. For example, SEND_WCMD7 starts at counter=24002
+        and transitions to SEND_WCMD6 at counter=24005 → that's a 4-tick span = 1 SCLK cycle.
+        This is why you see every state spanning exactly 4 counter values in the Verilog code.
+      </p>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART C: SPI 93-STATE MACHINE                                     -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(167,139,250,0.08), rgba(56,189,248,0.08)); border-radius:16px; padding:28px; border:2px solid var(--accent2); margin-bottom:28px;">
+    <h3 style="color:var(--accent2); font-size:1.3em; margin-bottom:16px;">C. SPI 93-State Machine — Complete State Map</h3>
+
+    <p style="color:var(--textdim); margin-bottom:16px;">
+      The SPI master has exactly <strong>93 states</strong> (0x00–0x5C). Each state maps to one specific action in the SPI protocol.
+      The entire FSM runs on a single <code>always @(posedge iclk)</code> block with a global <code>counter</code> register.
+      State transitions happen at specific counter values — no separate clock; just a big case statement.
+    </p>
+
+    <table class="styled-table" style="font-size:0.85em;">
+      <thead>
+        <tr><th>State Range</th><th>Hex</th><th>Count</th><th>Phase</th><th>What Happens</th></tr>
+      </thead>
+      <tbody>
+        <tr style="background:rgba(100,116,139,0.1);"><td style="color:var(--textdim); font-weight:600;">POWER_UP</td><td>0x00</td><td>1</td><td>Init</td><td>Wait 6 ms (24,000 ticks @ 4 MHz) for ADXL362 to reach standby after power-on</td></tr>
+        <tr style="background:rgba(37,99,235,0.08);"><td style="color:#3b82f6; font-weight:600;">BEGIN_SPIW</td><td>0x01</td><td>1</td><td>Write</td><td>Pull CS LOW to begin the write transaction</td></tr>
+        <tr style="background:rgba(37,99,235,0.08);"><td style="color:#3b82f6; font-weight:600;">SEND_WCMD[7:0]</td><td>0x02–0x09</td><td>8</td><td>Write</td><td>Shift out write command byte 0x0A bit-by-bit (MSB first) on MOSI</td></tr>
+        <tr style="background:rgba(37,99,235,0.08);"><td style="color:#3b82f6; font-weight:600;">SEND_WADDR[7:0]</td><td>0x0A–0x11</td><td>8</td><td>Write</td><td>Shift out register address 0x2D (mode register) on MOSI</td></tr>
+        <tr style="background:rgba(37,99,235,0.08);"><td style="color:#3b82f6; font-weight:600;">SEND_BYTE[7:0]</td><td>0x12–0x19</td><td>8</td><td>Write</td><td>Shift out data byte 0x02 (measurement mode enable) on MOSI</td></tr>
+        <tr style="background:rgba(100,116,139,0.1);"><td style="color:var(--textdim); font-weight:600;">WAIT</td><td>0x1A</td><td>1</td><td>Wait</td><td>Wait 40 ms (160,000 ticks) for first valid measurement data</td></tr>
+        <tr style="background:rgba(22,163,106,0.08);"><td style="color:#22c55e; font-weight:600;">BEGIN_SPIR</td><td>0x1B</td><td>1</td><td>Read</td><td>Pull CS LOW + enable SCLK to begin read transaction</td></tr>
+        <tr style="background:rgba(22,163,106,0.08);"><td style="color:#22c55e; font-weight:600;">SEND_RCMD[7:0]</td><td>0x1C–0x23</td><td>8</td><td>Read</td><td>Shift out read command byte 0x0B on MOSI</td></tr>
+        <tr style="background:rgba(22,163,106,0.08);"><td style="color:#22c55e; font-weight:600;">SEND_RADDR[7:0]</td><td>0x24–0x2B</td><td>8</td><td>Read</td><td>Shift out start address 0x0E (X_LSB) on MOSI</td></tr>
+        <tr style="background:rgba(220,38,38,0.08);"><td style="color:#ef4444; font-weight:600;">REC_XLSB[7:0]</td><td>0x2C–0x33</td><td>8</td><td>Receive</td><td>Sample X-axis LSB byte from MISO → store in X[7:0]</td></tr>
+        <tr style="background:rgba(220,38,38,0.08);"><td style="color:#ef4444; font-weight:600;">REC_XMSB[7:0]</td><td>0x34–0x3B</td><td>8</td><td>Receive</td><td>Sample X-axis MSB byte from MISO → store in X[15:8]</td></tr>
+        <tr style="background:rgba(220,38,38,0.08);"><td style="color:#ef4444; font-weight:600;">REC_YLSB[7:0]</td><td>0x3C–0x43</td><td>8</td><td>Receive</td><td>Sample Y-axis LSB byte from MISO → store in Y[7:0]</td></tr>
+        <tr style="background:rgba(220,38,38,0.08);"><td style="color:#ef4444; font-weight:600;">REC_YMSB[7:0]</td><td>0x44–0x4B</td><td>8</td><td>Receive</td><td>Sample Y-axis MSB byte from MISO → store in Y[15:8]</td></tr>
+        <tr style="background:rgba(220,38,38,0.08);"><td style="color:#ef4444; font-weight:600;">REC_ZLSB[7:0]</td><td>0x4C–0x53</td><td>8</td><td>Receive</td><td>Sample Z-axis LSB byte from MISO → store in Z[7:0]</td></tr>
+        <tr style="background:rgba(220,38,38,0.08);"><td style="color:#ef4444; font-weight:600;">REC_ZMSB[7:0]</td><td>0x54–0x5B</td><td>8</td><td>Receive</td><td>Sample Z-axis MSB byte from MISO → store in Z[15:8]</td></tr>
+        <tr style="background:rgba(250,204,21,0.08);"><td style="color:var(--accent6); font-weight:600;">END_SPI</td><td>0x5C</td><td>1</td><td>End</td><td>Release CS HIGH, disable SCLK, latch data, wait 10 ms, loop back to BEGIN_SPIR</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--textdim); font-size:0.85em; margin-top:8px;">Total: 1 + 1 + 24 + 1 + 1 + 24 + 48 + 1 = <strong>93 states</strong> (states 0x00 through 0x5C = 93 values)</p>
+
+    <!-- SPI State Flow SVG -->
+    <div style="background:var(--bg); border-radius:12px; padding:20px; margin-top:16px; overflow-x:auto;">
+      <h4 style="color:var(--accent2); margin-bottom:12px;">Complete SPI Flow Diagram</h4>
+      <svg viewBox="0 0 1050 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:800px;">
+        <!-- POWER_UP -->
+        <rect x="10" y="70" width="100" height="60" rx="12" fill="#334155" stroke="#64748b" stroke-width="2"/>
+        <text x="60" y="95" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="700">POWER_UP</text>
+        <text x="60" y="115" text-anchor="middle" fill="#64748b" font-size="9">6 ms wait</text>
+
+        <path d="M110,100 L140,100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- WRITE BLOCK -->
+        <rect x="140" y="60" width="200" height="80" rx="14" fill="rgba(37,99,235,0.15)" stroke="#3b82f6" stroke-width="2"/>
+        <text x="240" y="82" text-anchor="middle" fill="#3b82f6" font-size="12" font-weight="700">SPI WRITE (25 states)</text>
+        <text x="240" y="98" text-anchor="middle" fill="#94a3b8" font-size="9">0x0A → 0x2D → 0x02</text>
+        <text x="240" y="112" text-anchor="middle" fill="#94a3b8" font-size="9">CS LOW → 24 bits → CS HIGH</text>
+        <text x="240" y="128" text-anchor="middle" fill="#64748b" font-size="8">Sets measurement mode</text>
+
+        <path d="M340,100 L370,100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- WAIT -->
+        <rect x="370" y="70" width="90" height="60" rx="12" fill="#334155" stroke="#64748b" stroke-width="2"/>
+        <text x="415" y="95" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="700">WAIT</text>
+        <text x="415" y="115" text-anchor="middle" fill="#64748b" font-size="9">40 ms wait</text>
+
+        <path d="M460,100 L490,100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- READ BLOCK -->
+        <rect x="490" y="40" width="260" height="120" rx="14" fill="rgba(22,163,106,0.15)" stroke="#22c55e" stroke-width="2"/>
+        <text x="620" y="62" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="700">SPI READ (66 states)</text>
+        <text x="620" y="80" text-anchor="middle" fill="#94a3b8" font-size="9">TX: 0x0B → 0x0E (16 bits)</text>
+        <text x="620" y="96" text-anchor="middle" fill="#94a3b8" font-size="9">RX: X_L,X_H,Y_L,Y_H,Z_L,Z_H (48 bits)</text>
+        <text x="620" y="112" text-anchor="middle" fill="#94a3b8" font-size="9">CS LOW → 64 bits total → CS HIGH</text>
+        <text x="620" y="130" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="600">Latches acl_data at END_SPI</text>
+        <text x="620" y="148" text-anchor="middle" fill="#64748b" font-size="8">ADXL362 auto-increments address</text>
+
+        <path d="M750,100 L780,100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- END_SPI -->
+        <rect x="780" y="70" width="100" height="60" rx="12" fill="rgba(250,204,21,0.15)" stroke="#facc15" stroke-width="2"/>
+        <text x="830" y="95" text-anchor="middle" fill="#facc15" font-size="11" font-weight="700">END_SPI</text>
+        <text x="830" y="115" text-anchor="middle" fill="#64748b" font-size="9">10 ms wait</text>
+
+        <!-- Loop back arrow -->
+        <path d="M830,130 C830,180 620,190 530,160" stroke="#22c55e" stroke-width="2" fill="none" stroke-dasharray="6,3" marker-end="url(#arrow-grn)"/>
+        <text x="680" y="188" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="600">↺ Loop @ 100 Hz</text>
+
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/></marker>
+          <marker id="arrow-grn" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#22c55e"/></marker>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART D: SPI WRITE TRANSACTION                                    -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(37,99,235,0.08), rgba(167,139,250,0.05)); border-radius:16px; padding:28px; border:2px solid #3b82f6; margin-bottom:28px;">
+    <h3 style="color:#3b82f6; font-size:1.3em; margin-bottom:16px;">D. SPI Write Transaction — Initializing the ADXL362</h3>
+
+    <p style="color:var(--textdim); margin-bottom:16px;">
+      The write transaction runs <strong>only once</strong> at startup. It sends 3 bytes to the ADXL362 to switch it from standby to measurement mode.
+      This is essential — without this write, the sensor outputs only zeros.
+    </p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
+      <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
+        <div style="color:#3b82f6; font-size:2em; font-weight:800;">0x0A</div>
+        <div style="color:var(--textdim); font-size:0.85em; margin-top:4px;">Byte 1: Write Command</div>
+        <div style="color:#64748b; font-size:0.8em; margin-top:2px;">Tells ADXL362 "incoming write"</div>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
+        <div style="color:#a78bfa; font-size:2em; font-weight:800;">0x2D</div>
+        <div style="color:var(--textdim); font-size:0.85em; margin-top:4px;">Byte 2: Register Address</div>
+        <div style="color:#64748b; font-size:0.8em; margin-top:2px;">POWER_CTL register (mode control)</div>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; text-align:center;">
+        <div style="color:#22c55e; font-size:2em; font-weight:800;">0x02</div>
+        <div style="color:var(--textdim); font-size:0.85em; margin-top:4px;">Byte 3: Data Value</div>
+        <div style="color:#64748b; font-size:0.8em; margin-top:2px;">Measurement mode ON</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg); border-radius:10px; padding:16px;">
+      <h4 style="color:#3b82f6; margin-bottom:8px;">Write Waveform (24 SCLK cycles)</h4>
+      <div style="font-family:monospace; font-size:0.82em; color:#3b82f6; line-height:1.5; overflow-x:auto; white-space:pre;">
+CS    ▓▓▓▓╗                                                                                            ╔▓▓▓
+SCLK  ─────┘╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱└──────
+MOSI  ─────[0][0][0][0][1][0][1][0]│[0][0][1][0][1][1][0][1]│[0][0][0][0][0][0][1][0]──
+              └── 0x0A (Write) ──┘   └── 0x2D (Addr) ──┘    └── 0x02 (Data) ──┘
+              ├─── 8 SCLK cycles ──┤ ├─── 8 SCLK cycles ──┤  ├─── 8 SCLK cycles ──┤
+      </div>
+    </div>
+
+    <details style="margin-top:16px;">
+      <summary>📖 Code Walkthrough — Write States (Lines 177–338)</summary>
+      <div class="detail-body" style="font-size:0.9em;">
+        <p style="color:var(--textdim);">The write sequence follows this exact pattern:</p>
+        <ol style="color:var(--textdim); padding-left:20px;">
+          <li><strong>POWER_UP (L177-180):</strong> Waits until <code>counter == 23999</code> (= 24,000 ticks × 250 ns = 6 ms). This gives the ADXL362 time to finish its internal power-on reset.</li>
+          <li><strong>BEGIN_SPIW (L184-189):</strong> At <code>counter == 24001</code>, pulls <code>cs &lt;= 0</code> to select the slave and transitions to SEND_WCMD7.</li>
+          <li><strong>SEND_WCMD[7:0] (L193-233):</strong> Each state drives <code>mosi &lt;= write_instr[N]</code> where N goes from 7 down to 0. States transition every 4 ticks. <code>sclk_control</code> is set to 1 at the first bit state, enabling the 1 MHz clock.</li>
+          <li><strong>SEND_WADDR[7:0] (L237-276):</strong> Same pattern, shifts out <code>mode_reg_addr = 0x2D</code> bit by bit.</li>
+          <li><strong>SEND_BYTE[7:0] (L280-330):</strong> Shifts out <code>mode_wr_data = 0x02</code>. On the LAST bit (SEND_BYTE0), at <code>counter == 24097</code>: resets counter to 0, pulls CS high, disables SCLK, and transitions to WAIT.</li>
+          <li><strong>WAIT (L334-339):</strong> Waits <code>counter == 160002</code> (= 40 ms). The ADXL362 datasheet requires waiting for the first valid measurement to be ready. Then transitions to BEGIN_SPIR for the read loop.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART E: SPI READ TRANSACTION                                     -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(22,163,106,0.08), rgba(52,211,153,0.05)); border-radius:16px; padding:28px; border:2px solid #22c55e; margin-bottom:28px;">
+    <h3 style="color:#22c55e; font-size:1.3em; margin-bottom:16px;">E. SPI Read Transaction — 6-Byte Burst Read</h3>
+
+    <p style="color:var(--textdim); margin-bottom:16px;">
+      After initialization, the SPI master enters an <strong>infinite read loop</strong>. Each iteration reads 6 consecutive bytes from the ADXL362 
+      starting at address 0x0E (X_DATA_L). The ADXL362 <strong>auto-increments</strong> the address after each byte, 
+      so we get X_L, X_H, Y_L, Y_H, Z_L, Z_H in one continuous transaction.
+    </p>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-bottom:16px;">
+      <h4 style="color:var(--accent6); margin-bottom:12px;">ADXL362 Register Map (Read Addresses)</h4>
+      <table class="styled-table" style="font-size:0.85em;">
+        <thead><tr><th>Address</th><th>Register</th><th>Content</th><th>Stored In</th></tr></thead>
+        <tbody>
+          <tr><td>0x0E</td><td>XDATA_L</td><td>X-axis bits [7:0]</td><td>X[7:0]</td></tr>
+          <tr><td>0x0F</td><td>XDATA_H</td><td>X-axis bits [15:8] (4 MSB = sign ext)</td><td>X[15:8]</td></tr>
+          <tr><td>0x10</td><td>YDATA_L</td><td>Y-axis bits [7:0]</td><td>Y[7:0]</td></tr>
+          <tr><td>0x11</td><td>YDATA_H</td><td>Y-axis bits [15:8]</td><td>Y[15:8]</td></tr>
+          <tr><td>0x12</td><td>ZDATA_L</td><td>Z-axis bits [7:0]</td><td>Z[7:0]</td></tr>
+          <tr><td>0x13</td><td>ZDATA_H</td><td>Z-axis bits [15:8]</td><td>Z[15:8]</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:var(--bg); border-radius:10px; padding:16px;">
+      <h4 style="color:#22c55e; margin-bottom:8px;">Read Waveform (64 SCLK cycles total)</h4>
+      <div style="font-family:monospace; font-size:0.78em; color:#22c55e; line-height:1.5; overflow-x:auto; white-space:pre;">
+CS    ▓▓╗                                                                                                              ╔▓▓
+SCLK  ───┘╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱└───
+MOSI  ───[0x0B Read Cmd (8 bits)][0x0E Address (8 bits)][ don't care during receive phase (48 bits) ]────
+MISO  ───[ ignored during TX (16 bits) ][ X_L (8) ][ X_H (8) ][ Y_L (8) ][ Y_H (8) ][ Z_L (8) ][ Z_H (8) ]
+          ├──── TX: 16 SCLK ────────────┤├─────────────── RX: 48 SCLK ────────────────────────────────────┤
+      </div>
+    </div>
+
+    <details style="margin-top:16px;">
+      <summary>📖 Code Walkthrough — Read & Receive States (Lines 341–706)</summary>
+      <div class="detail-body" style="font-size:0.9em;">
+        <p style="color:var(--textdim);">The read loop follows this pattern (repeats forever at ~100 Hz):</p>
+        <ol style="color:var(--textdim); padding-left:20px;">
+          <li><strong>BEGIN_SPIR (L343-350):</strong> Resets counter, at <code>counter == 1</code> pulls CS low and enables SCLK simultaneously.</li>
+          <li><strong>SEND_RCMD[7:0] (L354-393):</strong> Shifts out <code>read_instr = 0x0B</code> on MOSI. Each state spans 4 counter ticks. Counter starts at 2 here (not 0) because BEGIN_SPIR consumed tick 0-1.</li>
+          <li><strong>SEND_RADDR[7:0] (L397-436):</strong> Shifts out <code>x_LSB_addr = 0x0E</code> on MOSI. After this, the ADXL362 knows we want to read starting from register 0x0E.</li>
+          <li><strong>REC_XLSB[7:0] through REC_ZMSB[7:0] (L440-697):</strong> 48 receive states. Each state <strong>samples MISO</strong> directly into the appropriate bit position: e.g., <code>X[7] &lt;= miso</code> in REC_XLSB7. The ADXL362 auto-increments the register pointer, so bytes come in order: X_L, X_H, Y_L, Y_H, Z_L, Z_H.</li>
+          <li><strong>REC_ZMSB0 (L690-697):</strong> After the last received bit, at <code>counter == 256</code>: CS goes high, SCLK disabled, transitions to END_SPI.</li>
+          <li><strong>END_SPI (L701-706):</strong> At <code>counter == 258</code>, the <code>latch_data</code> signal fires, capturing packed data into <code>temp_DATA</code>. Then waits until <code>counter == 40259</code> (= 10 ms inter-read gap) before looping back to BEGIN_SPIR.</li>
+        </ol>
+        <p style="color:var(--accent4); margin-top:8px;">
+          <strong>Key detail:</strong> The MISO data is sampled at the <em>beginning</em> of each state (on the posedge of iclk), which aligns with the rising edge of SCLK (SPI Mode 0 compliance). The 4-tick-per-state design ensures the slave has time to set up its MISO before the next rising edge.
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART F: DATA PACKING                                             -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(220,38,38,0.08), rgba(251,146,60,0.05)); border-radius:16px; padding:28px; border:2px solid #ef4444; margin-bottom:28px;">
+    <h3 style="color:#ef4444; font-size:1.3em; margin-bottom:16px;">F. Data Packing — 16-bit Raw → 5-bit Per Axis → 15-bit Bus</h3>
+
+    <p style="color:var(--textdim); margin-bottom:16px;">
+      Each axis of the ADXL362 outputs a <strong>12-bit signed value</strong> in a 16-bit register. The SPI master keeps only the <strong>top 5 bits [11:7]</strong> of each axis, 
+      giving sign + 4-bit magnitude. The 3 axes pack into a single 15-bit bus.
+    </p>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-bottom:16px;">
+      <h4 style="color:var(--accent6); margin-bottom:12px;">Bit Extraction (Line 713)</h4>
+      <div style="font-family:monospace; font-size:0.85em; background:var(--bg); padding:16px; border-radius:8px; color:var(--textdim); overflow-x:auto; white-space:pre;">
+Raw 16-bit register (example X = 0x0180):
+  Bit:  15 14 13 12 | 11 10  9  8 |  7  6  5  4 |  3  2  1  0
+  Hex:    0    1     |      8      |      0       |      0
+  Bin:  0  0  0  0  |  0  0  0  1  |  1  0  0  0  |  0  0  0  0
+                     └──────┐
+                     X[11:7] = 00011 = sign(0) + mag(0011) = +3
+                     
+Code: temp_DATA &lt;= { X[11:7], Y[11:7], Z[11:7] };
+
+Result:  acl_data = { 00011,  00010,  00011 }
+                      X=+3    Y=+2    Z=+3
+                    = 15'b0_0011_0_0010_0_0011
+                    = 15'h0C43
+      </div>
+    </div>
+
+    <div style="display:flex; gap:4px; margin:16px 0; flex-wrap:wrap;">
+      <div style="display:flex; gap:2px;">
+        <div style="background:#ef4444; color:#fff; padding:8px 6px; border-radius:6px 0 0 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:36px;">14<br><span style="font-size:0.7em;">±</span></div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">13</div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">12</div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">11</div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; border-radius:0 6px 6px 0; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">10</div>
+      </div>
+      <div style="display:flex; gap:2px;">
+        <div style="background:#3b82f6; color:#fff; padding:8px 6px; border-radius:6px 0 0 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:36px;">9<br><span style="font-size:0.7em;">±</span></div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">8</div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">7</div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">6</div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; border-radius:0 6px 6px 0; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">5</div>
+      </div>
+      <div style="display:flex; gap:2px;">
+        <div style="background:#22c55e; color:#fff; padding:8px 6px; border-radius:6px 0 0 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:36px;">4<br><span style="font-size:0.7em;">±</span></div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">3</div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">2</div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">1</div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; border-radius:0 6px 6px 0; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">0</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.9em;">
+      <span style="color:#ef4444;">■ X axis: acl_data[14:10] = {sign, mag[3:0]}</span>
+      <span style="color:#3b82f6;">■ Y axis: acl_data[9:5] = {sign, mag[3:0]}</span>
+      <span style="color:#22c55e;">■ Z axis: acl_data[4:0] = {sign, mag[3:0]}</span>
+    </div>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-top:16px;">
+      <h4 style="color:var(--accent4); margin-bottom:8px;">Latch Timing (Lines 711-720)</h4>
+      <p style="color:var(--textdim); font-size:0.9em;">
+        The data latch happens on the <strong>negative edge</strong> of iclk (<code>@(negedge iclk)</code>), specifically when 
+        <code>state_reg == END_SPI</code> and <code>counter == 258</code>. This ensures the X, Y, Z registers 
+        have fully settled (all 48 bits received) before packing. The <code>temp_DATA</code> output register 
+        is assigned from <code>acl_data</code>, providing a clean, glitch-free 15-bit bus to downstream modules.
+      </p>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART G: ACTION FSM MODULE OVERVIEW                               -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(251,146,60,0.08), rgba(244,114,182,0.05)); border-radius:16px; padding:28px; border:2px solid var(--accent4); margin-bottom:28px;">
+    <h3 style="color:var(--accent4); font-size:1.3em; margin-bottom:16px;">G. Action FSM — Module Overview & Ports</h3>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-bottom:16px;">
+      <h4 style="color:var(--accent4); margin-bottom:8px;">What is action_fsm?</h4>
+      <p style="color:var(--textdim);">
+        <code>action_fsm.v</code> is the <strong>game brain</strong> — it receives the 15-bit accelerometer data from <code>spi_master</code>,
+        runs a <strong>6-state FSM</strong> (IDLE → INIT → THROW → PULL → TURN → DONE), and detects gestures to score points.
+        It uses a <strong>self-calibrating baseline</strong> to distinguish real motion from static tilt, and applies
+        <strong>edge detection + cooldown debounce</strong> to prevent multiple triggers from a single gesture.
+        The game runs for exactly 28 seconds (4s INIT + 8s × 3 phases).
+      </p>
+    </div>
+
+    <h4 style="margin-bottom:12px;">Port Interface</h4>
+    <table class="styled-table">
+      <thead>
+        <tr><th>Port</th><th>Dir</th><th>Width</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:var(--accent4); font-weight:600;">CLK100MHZ</td><td>Input</td><td>1</td><td>100 MHz system clock. All FSM logic runs at full speed for precise timing.</td></tr>
+        <tr><td style="color:var(--accent4); font-weight:600;">start</td><td>Input</td><td>1</td><td>SW0 switch. HIGH = game runs. LOW from any state = instant reset to IDLE.</td></tr>
+        <tr><td style="color:var(--accent4); font-weight:600;">acl_data[14:0]</td><td>Input</td><td>15</td><td>Packed accelerometer data from spi_master: {X[4:0], Y[4:0], Z[4:0]}.</td></tr>
+        <tr><td style="color:var(--accent3); font-weight:600;">final_marks[7:0]</td><td>Output</td><td>8</td><td>Cumulative score (0–255). Displayed on 7-segment (AN0–AN1) and VGA.</td></tr>
+        <tr><td style="color:var(--accent3); font-weight:600;">timer_sec[3:0]</td><td>Output</td><td>4</td><td>Seconds remaining in current phase (countdown). Displayed on 7-segment (AN6–AN7).</td></tr>
+        <tr><td style="color:var(--accent3); font-weight:600;">state_out[2:0]</td><td>Output</td><td>3</td><td>Current FSM state (0–5). Used by VGA_TEST and audio_processor for display/sound sync.</td></tr>
+      </tbody>
+    </table>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-top:16px;">
+      <h4 style="color:var(--accent6); margin-bottom:8px;">Parameter: CYCLES_PER_SEC</h4>
+      <p style="color:var(--textdim); font-size:0.9em;">
+        The module has one parameter: <code>CYCLES_PER_SEC</code> (default = 100,000,000 for 100 MHz).
+        This defines how many clock cycles equal 1 second. In the testbench, this is overridden to <strong>1,000</strong> 
+        to make the simulation run 100,000× faster (28 seconds of game time = 280 µs of simulation time).
+        All timing — phase durations, cooldowns, baseline update rate — scales proportionally with this parameter.
+      </p>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART H: ACTION FSM 6-STATE MACHINE                               -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(251,146,60,0.1), rgba(220,38,38,0.05)); border-radius:16px; padding:28px; border:2px solid var(--accent4); margin-bottom:28px;">
+    <h3 style="color:var(--accent4); font-size:1.3em; margin-bottom:16px;">H. Action FSM — 6-State Machine (Complete)</h3>
+
+    <!-- State Diagram SVG -->
+    <div style="background:var(--bg); border-radius:12px; padding:20px; margin-bottom:20px; overflow-x:auto;">
+      <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:700px;">
+        <!-- States -->
+        <rect x="20" y="120" width="100" height="55" rx="27" fill="#334155" stroke="#64748b" stroke-width="2.5"/>
+        <text x="70" y="147" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="700">S_IDLE</text>
+        <text x="70" y="165" text-anchor="middle" fill="#64748b" font-size="9">state=0</text>
+
+        <rect x="160" y="120" width="100" height="55" rx="27" fill="#334155" stroke="#475569" stroke-width="2.5"/>
+        <text x="210" y="147" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="700">S_INIT</text>
+        <text x="210" y="165" text-anchor="middle" fill="#64748b" font-size="9">4 sec</text>
+
+        <rect x="300" y="120" width="110" height="55" rx="27" fill="rgba(220,38,38,0.2)" stroke="#ef4444" stroke-width="2.5"/>
+        <text x="355" y="147" text-anchor="middle" fill="#ef4444" font-size="13" font-weight="700">S_THROW</text>
+        <text x="355" y="165" text-anchor="middle" fill="#64748b" font-size="9">8 sec</text>
+
+        <rect x="450" y="120" width="110" height="55" rx="27" fill="rgba(37,99,235,0.2)" stroke="#3b82f6" stroke-width="2.5"/>
+        <text x="505" y="147" text-anchor="middle" fill="#3b82f6" font-size="13" font-weight="700">S_PULL</text>
+        <text x="505" y="165" text-anchor="middle" fill="#64748b" font-size="9">8 sec</text>
+
+        <rect x="600" y="120" width="110" height="55" rx="27" fill="rgba(22,163,106,0.2)" stroke="#22c55e" stroke-width="2.5"/>
+        <text x="655" y="147" text-anchor="middle" fill="#22c55e" font-size="13" font-weight="700">S_TURN</text>
+        <text x="655" y="165" text-anchor="middle" fill="#64748b" font-size="9">8 sec</text>
+
+        <rect x="750" y="120" width="110" height="55" rx="27" fill="rgba(250,204,21,0.2)" stroke="#facc15" stroke-width="2.5"/>
+        <text x="805" y="147" text-anchor="middle" fill="#facc15" font-size="13" font-weight="700">S_DONE</text>
+        <text x="805" y="165" text-anchor="middle" fill="#64748b" font-size="9">hold</text>
+
+        <!-- Forward arrows -->
+        <path d="M120,147 L155,147" stroke="#64748b" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="137" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">SW0=1</text>
+        <path d="M260,147 L295,147" stroke="#475569" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="277" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">4s done</text>
+        <path d="M410,147 L445,147" stroke="#ef4444" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="427" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">8s done</text>
+        <path d="M560,147 L595,147" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="577" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">8s done</text>
+        <path d="M710,147 L745,147" stroke="#22c55e" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="727" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">8s done</text>
+
+        <!-- Self-loop on DONE -->
+        <path d="M805,175 C805,210 850,210 850,175" stroke="#facc15" stroke-width="1.5" fill="none" marker-end="url(#arr-y)"/>
+
+        <!-- Global reset arrow -->
+        <path d="M450,60 C250,20 100,40 70,115" stroke="#f472b6" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arr-p)"/>
+        <text x="280" y="32" text-anchor="middle" fill="#f472b6" font-size="10" font-weight="600">SW0 = 0 → reset from ANY state</text>
+
+        <!-- Phase labels -->
+        <text x="355" y="102" text-anchor="middle" fill="#ef4444" font-size="9">Z→X arm+score</text>
+        <text x="505" y="102" text-anchor="middle" fill="#3b82f6" font-size="9">X spike score</text>
+        <text x="655" y="102" text-anchor="middle" fill="#22c55e" font-size="9">Y/Z flip count</text>
+
+        <!-- Score indicators below -->
+        <text x="355" y="195" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="600">⚡ Threshold ≥ 5</text>
+        <text x="505" y="195" text-anchor="middle" fill="#3b82f6" font-size="9" font-weight="600">⚡ Threshold ≥ 2</text>
+        <text x="655" y="195" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="600">⚡ 2 flips = 1 pt</text>
+
+        <text x="210" y="195" text-anchor="middle" fill="#94a3b8" font-size="9">Baseline calibrating</text>
+
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/></marker>
+          <marker id="arr-y" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#facc15"/></marker>
+          <marker id="arr-p" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f472b6"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid #64748b;">
+        <h4 style="color:#94a3b8; font-size:0.95em;">S_IDLE (state=0) — Lines 133–143</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">Clears ALL registers (score, timer, cooldown, throw_armed, turn_flips). Baselines snap to live accelerometer reading. Immediately transitions to S_INIT (start is guaranteed HIGH here because <code>!start</code> holds the FSM in the reset block above).</p>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid #475569;">
+        <h4 style="color:#94a3b8; font-size:0.95em;">S_INIT (state=1) — Lines 145–154</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">4-second calibration period. No scoring happens. The self-calibrating baseline slowly tracks the resting accelerometer level. After 4 second-ticks, transitions to S_THROW with cooldown and throw_armed reset to 0.</p>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid #ef4444;">
+        <h4 style="color:#ef4444; font-size:0.95em;">S_THROW (state=2) — Lines 157–175</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">8 seconds. Two-step scoring: first a Z-axis spike rising edge sets <code>throw_armed=1</code>, then an X-axis spike rising edge scores +1 and resets armed. Cooldown 0.25s prevents rapid-fire. After 8s → S_PULL.</p>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid #3b82f6;">
+        <h4 style="color:#3b82f6; font-size:0.95em;">S_PULL (state=3) — Lines 178–192</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">8 seconds. Single-step scoring: any X-axis deviation rising edge (threshold ≥ 2 from baseline) scores +1. Lowest threshold = easiest phase. Cooldown 0.25s. After 8s → S_TURN.</p>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid #22c55e;">
+        <h4 style="color:#22c55e; font-size:0.95em;">S_TURN (state=4) — Lines 195–225</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">8 seconds. Counts sign flips on Y and Z axes (pooled counter). Every 2 flips = 1 point. Magnitude must be ≥ 4 (noise gate). Counter resets after scoring + 0.25s cooldown. After 8s → S_DONE.</p>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:16px; border-left:4px solid #facc15;">
+        <h4 style="color:#facc15; font-size:0.95em;">S_DONE (state=5) — Line 227</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">Terminal state. Score is frozen. Self-loops forever. Only way out: SW0 → LOW triggers the <code>!start</code> reset block, which jumps back to S_IDLE and clears everything.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART I: BASELINE SYSTEM                                          -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(56,189,248,0.08), rgba(167,139,250,0.05)); border-radius:16px; padding:28px; border:2px solid var(--accent1); margin-bottom:28px;">
+    <h3 style="color:var(--accent1); font-size:1.3em; margin-bottom:16px;">I. Self-Calibrating Baseline System</h3>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-bottom:16px;">
+      <h4 style="color:var(--accent1); margin-bottom:8px;">Why Baselines?</h4>
+      <p style="color:var(--textdim);">
+        Without baselines, a tilted board would constantly report high X or Z values, triggering false scores.
+        The baseline system measures the "resting" level of each axis and only counts <em>deviation from baseline</em> as motion.
+        This means you can hold the board at any angle and it won't score — only actual movement (jerks, twists) will.
+      </p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+      <div style="background:var(--card); border-radius:12px; padding:20px;">
+        <h4 style="color:var(--accent3); margin-bottom:8px;">During IDLE: Instant Snap</h4>
+        <div style="font-family:monospace; font-size:0.85em; background:var(--bg); padding:12px; border-radius:8px; color:var(--accent3);">
+if (state == S_IDLE) begin<br>
+&nbsp;&nbsp;base_x &lt;= x_w; // snap to live reading<br>
+&nbsp;&nbsp;base_z &lt;= z_w; // instantly<br>
+&nbsp;&nbsp;base_div &lt;= 0;<br>
+end
+        </div>
+        <p style="color:var(--textdim); font-size:0.85em; margin-top:8px;">In IDLE, baselines copy the current reading every clock cycle. No delay.</p>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:20px;">
+        <h4 style="color:var(--accent4); margin-bottom:8px;">During Gameplay: Slow Drift</h4>
+        <div style="font-family:monospace; font-size:0.85em; background:var(--bg); padding:12px; border-radius:8px; color:var(--accent4);">
+// Every BASE_PERIOD cycles (= 1/16 sec):<br>
+if (x_w > base_x) base_x &lt;= base_x + 1;<br>
+if (x_w < base_x) base_x &lt;= base_x - 1;<br>
+// Same for Z axis
+        </div>
+        <p style="color:var(--textdim); font-size:0.85em; margin-top:8px;">During gameplay, baseline moves ±1 step every <code>CYCLES_PER_SEC/16</code> cycles = 16 Hz. This is slow enough that fast gestures create spikes above the baseline, but slow enough that gravity drift is absorbed.</p>
+      </div>
+    </div>
+
+    <div style="background:var(--bg); border-radius:10px; padding:16px;">
+      <h4 style="color:var(--accent1); margin-bottom:8px;">Deviation Calculation (Lines 80-81)</h4>
+      <div style="font-family:monospace; font-size:0.85em; color:var(--accent1); line-height:1.5;">
+wire [5:0] x_dev = (x_w > base_x) ? (x_w - base_x) : (base_x - x_w);  // |x - baseline|<br>
+wire [5:0] z_dev = (z_w > base_z) ? (z_w - base_z) : (base_z - z_w);  // |z - baseline|
+      </div>
+      <p style="color:var(--textdim); font-size:0.85em; margin-top:8px;">
+        Absolute difference — works regardless of direction. 6-bit width (range 0–63) is more than enough since magnitude is only 4 bits (0–15 max).
+      </p>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART J: SCORING ALGORITHMS                                       -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(220,38,38,0.08), rgba(37,99,235,0.05), rgba(22,163,106,0.05)); border-radius:16px; padding:28px; border:2px solid var(--accent5); margin-bottom:28px;">
+    <h3 style="color:var(--accent5); font-size:1.3em; margin-bottom:16px;">J. Scoring Algorithms — All 3 Phases (Complete)</h3>
+
+    <!-- THROW -->
+    <div class="scoring-block" style="border-color: #ef4444; margin-bottom:20px;">
+      <h4 style="color:#ef4444;">🤾 THROW Scoring (Lines 157–175) — Two-Step, Threshold ≥ 5</h4>
+      <p style="color:var(--textdim); margin-top:8px;">
+        <strong>Step 1 (ARM):</strong> A rising edge on <code>z_dev ≥ 5</code> sets <code>throw_armed = 1</code>. This detects the upward jerk of a throwing motion.<br>
+        <strong>Step 2 (SCORE):</strong> While armed, a rising edge on <code>x_dev ≥ 5</code> scores +1, clears armed, and starts 0.25s cooldown.<br>
+        <strong>Why two-step?</strong> Single-axis bumps (putting the board down, accidental tilts) only trigger one axis. A real throw involves Z-lift then X-thrust.
+      </p>
+      <div class="wave" style="color:#ef4444;">
+Z_dev ┃       ████                         z_rise_t = z_spk_t & ~z_spk_t_d
+      ┃      █    █                        (rising edge of z_dev ≥ 5)
+──────┃─ ─ DTH_THROW = 5 ─ ─ ─ ─ ─ ─
+      ┃ ▄▄▄▄▄      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+      ┃      └→ throw_armed = 1
+
+X_dev ┃                    ████            x_rise_t = x_spk_t & ~x_spk_t_d
+      ┃                   █    █           (rising edge of x_dev ≥ 5)
+──────┃─ ─ DTH_THROW = 5 ─ ─ ─ ─ ─ ─
+      ┃ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      ▄▄▄▄
+      ┃                   └→ ★ SCORE! (armed && x_rise_t)
+      ┃                      armed←0, cooldown←0.25s
+      </div>
+    </div>
+
+    <!-- PULL -->
+    <div class="scoring-block" style="border-color: #3b82f6; margin-bottom:20px;">
+      <h4 style="color:#3b82f6;">💪 PULL Scoring (Lines 178–192) — Single Spike, Threshold ≥ 2 (EASIEST)</h4>
+      <p style="color:var(--textdim); margin-top:8px;">
+        Any X-axis deviation rising edge ≥ 2 from baseline scores immediately. No arming needed.
+        The low threshold (DTH_PULL = 2, vs DTH_THROW = 5) makes this the most sensitive and easiest phase.
+        A gentle tug in any direction is enough.
+      </p>
+      <div class="wave" style="color:#3b82f6;">
+X_dev ┃    ███       ███              ███
+      ┃   █   █     █   █            █   █
+──────┃─ DTH_PULL=2 ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+      ┃ ▄▄     ▄▄▄▄▄     ▄▄▄▄▄▄▄▄▄▄     ▄
+      ┃   ↑         ↑                ↑
+      ┃ ★ +1      ★ +1            ★ +1
+      ┃ │←─0.25s─►│  (cooldown blocks re-trigger)
+
+Code: if (x_rise_p) begin              // rising edge of x_dev ≥ 2
+        final_marks &lt;= final_marks + 1;
+        cooldown &lt;= COOLDOWN_CYCLES - 1;
+      end
+      </div>
+    </div>
+
+    <!-- TURN -->
+    <div class="scoring-block" style="border-color: #22c55e;">
+      <h4 style="color:#22c55e;">🔄 TURN Scoring (Lines 195–225) — Sign-Flip Counter (2 flips = 1 point)</h4>
+      <p style="color:var(--textdim); margin-top:8px;">
+        Counts direction reversals on Y and Z axes. Both axes feed into a single <code>turn_flips</code> counter.
+        When <code>turn_flips ≥ 2</code>, score +1 and reset the counter. Magnitude ≥ 4 acts as a noise gate (ignoring small tremors).
+      </p>
+      <div class="wave" style="color:#22c55e;">
+Y_mag ┃  8  8  8  7  7  7  8  8  8       (magnitude ≥ TH_MOVE=4 ✓)
+Y_sign┃  +  +  +  -  -  -  +  +  +       sign flip at + → - and - → +
+      ┃         ↑               ↑
+      ┃       flip 1          flip 2     → turn_flips reaches 2 → ★ SCORE!
+
+Logic flow (Lines 200-216):
+  1. If y_mag ≥ 4 AND y_seen=0 → record first sign, set y_seen=1
+  2. If y_mag ≥ 4 AND y_sign ≠ y_last_sign → flip! turn_flips++
+  3. Same for Z axis (pooled into same counter)
+  4. If turn_flips ≥ 2 → final_marks++, turn_flips=0, cooldown=0.25s
+      </div>
+    </div>
+
+    <!-- Cooldown -->
+    <div style="background:var(--card); border-radius:12px; padding:20px; margin-top:16px;">
+      <h4 style="color:var(--accent6); margin-bottom:8px;">⏸️ Cooldown Debounce (All Phases)</h4>
+      <p style="color:var(--textdim); font-size:0.9em;">
+        After every point scored, a <code>cooldown</code> counter is loaded with <code>CYCLES_PER_SEC/4 - 1</code> (= 0.25 seconds).
+        While <code>cooldown ≠ 0</code>, no new scoring is possible — the counter decrements by 1 each clock cycle.
+        This prevents a single sustained gesture from scoring multiple points and gives the player clear feedback 
+        that each gesture is a discrete action.
+      </p>
+      <div style="font-family:monospace; font-size:0.85em; background:var(--bg); padding:12px; border-radius:8px; color:var(--accent6); margin-top:8px;">
+COOLDOWN_CYCLES = CYCLES_PER_SEC / 4 = 100_000_000 / 4 = 25,000,000 cycles = 0.25 sec<br>
+In testbench (CYCLES_PER_SEC=1000): COOLDOWN_CYCLES = 250 cycles = 2.5 µs
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART K: TIMING & COUNTER MATH                                    -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(250,204,21,0.08), rgba(251,146,60,0.05)); border-radius:16px; padding:28px; border:2px solid var(--accent6); margin-bottom:28px;">
+    <h3 style="color:var(--accent6); font-size:1.3em; margin-bottom:16px;">K. Timing & Counter Math</h3>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+      <div style="background:var(--card); border-radius:12px; padding:20px;">
+        <h4 style="color:var(--accent1); margin-bottom:12px;">SPI Master Timing (4 MHz clock)</h4>
+        <table class="styled-table" style="font-size:0.82em;">
+          <tr><td style="color:var(--accent1);">Clock period</td><td>250 ns (1/4MHz)</td></tr>
+          <tr><td style="color:var(--accent1);">POWER_UP wait</td><td>24,000 ticks = 6 ms</td></tr>
+          <tr><td style="color:var(--accent1);">Write transaction</td><td>~98 ticks = ~24.5 µs</td></tr>
+          <tr><td style="color:var(--accent1);">WAIT after write</td><td>160,003 ticks = 40 ms</td></tr>
+          <tr><td style="color:var(--accent1);">Read transaction</td><td>~257 ticks = ~64.25 µs</td></tr>
+          <tr><td style="color:var(--accent1);">END_SPI gap</td><td>~40,000 ticks = 10 ms</td></tr>
+          <tr><td style="color:var(--accent6);">Read loop period</td><td>~10.064 ms ≈ 100 Hz</td></tr>
+          <tr><td style="color:var(--accent1);">Bits per SPI cycle</td><td>4 ticks = 1 µs = 1 SCLK period</td></tr>
+        </table>
+      </div>
+      <div style="background:var(--card); border-radius:12px; padding:20px;">
+        <h4 style="color:var(--accent4); margin-bottom:12px;">Action FSM Timing (100 MHz clock)</h4>
+        <table class="styled-table" style="font-size:0.82em;">
+          <tr><td style="color:var(--accent4);">Clock period</td><td>10 ns (1/100MHz)</td></tr>
+          <tr><td style="color:var(--accent4);">1 second</td><td>100,000,000 cycles</td></tr>
+          <tr><td style="color:var(--accent4);">INIT phase</td><td>4 × 100M = 400M cycles (4 s)</td></tr>
+          <tr><td style="color:var(--accent4);">Each action phase</td><td>8 × 100M = 800M cycles (8 s)</td></tr>
+          <tr><td style="color:var(--accent4);">Total game time</td><td>4+8+8+8 = 28 s</td></tr>
+          <tr><td style="color:var(--accent4);">Cooldown</td><td>25,000,000 cycles (0.25 s)</td></tr>
+          <tr><td style="color:var(--accent4);">Baseline update</td><td>6,250,000 cycles (1/16 s)</td></tr>
+          <tr><td style="color:var(--accent6);">sec_tick fires when</td><td>sec_cycle ≥ CYCLES_PER_SEC - 1</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div style="background:var(--card); border-radius:12px; padding:20px;">
+      <h4 style="color:var(--accent3); margin-bottom:8px;">Countdown Timer Output (Lines 234–240)</h4>
+      <div style="font-family:monospace; font-size:0.85em; background:var(--bg); padding:12px; border-radius:8px; color:var(--accent3);">
+always @(*) begin<br>
+&nbsp;&nbsp;case (state)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;S_INIT: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; timer_sec = INIT_SECS - sec_count; &nbsp;// 4,3,2,1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;S_THROW, S_PULL, S_TURN: timer_sec = ACT_SECS - sec_count; &nbsp;&nbsp;// 8,7,6,...,1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;default: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; timer_sec = 0; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// IDLE/DONE<br>
+&nbsp;&nbsp;endcase<br>
+end
+      </div>
+      <p style="color:var(--textdim); font-size:0.85em; margin-top:8px;">
+        <code>sec_count</code> increments 0→1→2→3→... on each <code>sec_tick</code>. Subtracting from the phase length gives a countdown.
+        This is a combinational output (always @*), so it updates instantly when sec_count changes.
+      </p>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PART L: SIMULATION RESULTS                                       -->
+  <!-- ================================================================ -->
+  <div style="background:linear-gradient(135deg, rgba(52,211,153,0.1), rgba(56,189,248,0.05)); border-radius:16px; padding:28px; border:2px solid var(--accent3); margin-bottom:28px;">
+    <h3 style="color:var(--accent3); font-size:1.3em; margin-bottom:16px;">L. Simulation Results & Waveform Analysis</h3>
+
+    <p style="color:var(--textdim); margin-bottom:16px;">
+      Both modules were simulated using <strong>Icarus Verilog</strong> with custom testbenches that include behavioral models.
+      No real ADXL362 hardware is needed — the testbench for SPI creates a <strong>behavioral slave model</strong> that responds on the MISO line.
+    </p>
+
+    <!-- SPI SIMULATION -->
+    <div style="background:var(--card); border-radius:14px; padding:24px; border-left:4px solid var(--accent1); margin-bottom:20px;">
+      <h4 style="color:var(--accent1); margin-bottom:12px;">🔷 SPI Master Simulation — tb_spi_master.v</h4>
+      
+      <div style="background:var(--bg); border-radius:10px; padding:16px; margin-bottom:16px; font-family:monospace; font-size:0.8em; line-height:1.5; color:var(--textdim); overflow-x:auto; white-space:pre;">==========================================================
+ tb_spi_master : ADXL362 SPI driver simulation
+ Master clock (iclk) = 4 MHz (250 ns period)
+ Expected packed acl_data = 0x0C43 (X=3, Y=2, Z=3)
+==========================================================
+[6000625000 ns] CS pulled LOW  (SPI transaction begin)        ← Write transaction starts @ 6 ms
+[6024625000 ns] CS released HIGH                               ← Write done (24 SCLK cycles)
+[46025875000 ns] CS pulled LOW  (SPI transaction begin)       ← First read @ 46 ms (6ms + 40ms wait)
+[46089625000 ns] CS released HIGH                              ← Read done (64 SCLK cycles)
+[56090875000 ns] CS pulled LOW  (SPI transaction begin)       ← Second read @ 56 ms (10ms gap)
+[56154625000 ns] CS released HIGH
+----------------------------------------------------------
+ @65 ms  acl_data = 15'h0c43  (X=3 Y=2 Z=3)                 ← Matches expected!
+   DUT raw regs: X=0x0180 Y=0x8140 Z=0x01c0  state=0x5c
+   (expected: X=0x0180 Y=0x8140 Z=0x01C0)
+   <span style="color:var(--accent3); font-weight:700;">[PASS] SPI master correctly captured all 6 accel bytes.</span>
+[66155875000 ns] CS pulled LOW  (SPI transaction begin)       ← Reads continue @ 100 Hz...
+[66219625000 ns] CS released HIGH
+[76220875000 ns] CS pulled LOW  ...
+...
+ @105 ms acl_data = 15'h0c43                                  ← Still correct (stable reads)
+==========================================================
+ tb_spi_master DONE
+==========================================================</div>
+
+      <h4 style="color:var(--accent6); margin-bottom:8px;">Why It Looks Like This — Line by Line:</h4>
+      <div style="color:var(--textdim); font-size:0.9em;">
+        <ol style="padding-left:20px;">
+          <li><strong>First CS event at 6,000,625,000 ns (≈ 6 ms):</strong> This is the WRITE transaction. The SPI master waited 24,000 ticks × 250 ns = 6 ms for the ADXL362 power-up, then pulled CS LOW to start writing the measurement mode configuration (0x0A, 0x2D, 0x02).</li>
+          <li><strong>CS released at 6,024,625,000 ns:</strong> Write done in ~24 µs (24 SCLK bits × 1 µs each). CS goes HIGH, SCLK stops.</li>
+          <li><strong>Second CS event at 46,025,875,000 ns (≈ 46 ms):</strong> This is the FIRST READ. After the write, the FSM waited 40 ms (160,000 ticks) for the ADXL362 to produce valid data. Then it started reading 6 bytes (X_L, X_H, Y_L, Y_H, Z_L, Z_H).</li>
+          <li><strong>CS released at ~46.09 ms:</strong> Read done in ~64 µs (16 TX + 48 RX bits = 64 SCLK cycles). X, Y, Z registers are now populated.</li>
+          <li><strong>Third CS at ~56 ms:</strong> Second READ, 10 ms after the first (the END_SPI wait). This confirms the 100 Hz polling loop works.</li>
+          <li><strong>@ 65 ms check:</strong> <code>acl_data = 0x0C43</code> — matches the testbench's injected values perfectly:
+            <ul>
+              <li>X = 0x0180 → X[11:7] = 00011 = +3</li>
+              <li>Y = 0x8140 → Y[11:7] = 00010 = +2 (note: 0x81 has bit 15=1, but [11:7] ignores bits above 11)</li>
+              <li>Z = 0x01C0 → Z[11:7] = 00011 = +3</li>
+              <li>Packed: {00011, 00010, 00011} = 15'h0C43 ✓</li>
+            </ul>
+          </li>
+          <li><strong>@ 105 ms:</strong> Still 0x0C43 — data is stable across multiple read cycles, proving the 100 Hz loop and data latch work correctly.</li>
+        </ol>
+      </div>
+
+      <div style="background:var(--bg); border-radius:8px; padding:12px; margin-top:12px;">
+        <h4 style="color:var(--accent2); margin-bottom:6px; font-size:0.9em;">How the Testbench Slave Works</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">
+          The testbench contains a <strong>behavioral ADXL362 model</strong> (lines 56–152). Instead of counting SCLK edges like a real SPI slave, 
+          it peeks at the DUT's internal <code>state_reg</code> via hierarchical reference (<code>dut.state_reg</code>).
+          When the master is in a <code>REC_*</code> state (about to sample MISO), the model combinationally drives the correct bit of the corresponding data byte.
+          This guarantees perfect bit alignment without fragile edge counting.
+        </p>
+      </div>
+    </div>
+
+    <!-- ACTION FSM SIMULATION -->
+    <div style="background:var(--card); border-radius:14px; padding:24px; border-left:4px solid var(--accent4); margin-bottom:20px;">
+      <h4 style="color:var(--accent4); margin-bottom:12px;">🔶 Action FSM Simulation — tb_action_fsm.v</h4>
+      
+      <div style="background:var(--bg); border-radius:10px; padding:16px; margin-bottom:16px; font-family:monospace; font-size:0.8em; line-height:1.5; color:var(--textdim); overflow-x:auto; white-space:pre;">==========================================================
+ tb_action_fsm : gesture scoring FSM simulation
+ CYCLES_PER_SEC = 1000 (1 sec = 10 us sim time)
+ Expected final_marks = 4 (1 throw + 2 pull + 1 turn)
+==========================================================
+[20000 ns] SW0 -> 1 (start)                                   ← Game begins
+[35000 ns] STATE 0 -> 1                                       ← IDLE → INIT
+      state = S_INIT  (baseline calibrating, timer=4)
+[40035000 ns] STATE 1 -> 2                                    ← INIT → THROW (after 4 "seconds")
+      state = S_THROW (timer=8)
+[45020000 ns] entered gameplay; injecting THROW gesture
+[49035000 ns] >>> SCORE updated: 0 -> 1                       ← ★ THROW scored! (Z spike then X spike)
+[120035000 ns] STATE 2 -> 3                                   ← THROW → PULL (after 8 "seconds")
+      state = S_PULL  (timer=8)
+[128020000 ns] injecting PULL gesture
+[128035000 ns] >>> SCORE updated: 1 -> 2                      ← ★ PULL scored! (first X spike)
+[132035000 ns] >>> SCORE updated: 2 -> 3                      ← ★ PULL scored! (second X spike)
+[200035000 ns] STATE 3 -> 4                                   ← PULL → TURN (after 8 "seconds")
+      state = S_TURN  (timer=8)
+[211020000 ns] injecting TURN gesture
+[215045000 ns] >>> SCORE updated: 3 -> 4                      ← ★ TURN scored! (2 Y-sign flips)
+[280035000 ns] STATE 4 -> 5                                   ← TURN → DONE (after 8 "seconds")
+      state = S_DONE
+----------------------------------------------------------
+ FINAL SCORE = 4
+----------------------------------------------------------
+ <span style="color:var(--accent3); font-weight:700;">[PASS] score is 4 (1 throw + 2 pull + 1 turn).</span>
+==========================================================</div>
+
+      <h4 style="color:var(--accent6); margin-bottom:8px;">Why It Looks Like This — Event by Event:</h4>
+      <div style="color:var(--textdim); font-size:0.9em;">
+        <ol style="padding-left:20px;">
+          <li><strong>[20 µs] SW0 goes HIGH:</strong> The testbench asserts <code>start = 1</code> after a 20 ns delay. Since <code>CYCLES_PER_SEC = 1000</code>, all times are compressed 100,000×. The FSM exits the <code>!start</code> reset block.</li>
+          <li><strong>[35 µs] IDLE → INIT:</strong> S_IDLE immediately transitions to S_INIT on the next clock. There's a 15 µs gap because the FSM needed a couple of clock cycles to propagate through the IDLE state and reset all registers.</li>
+          <li><strong>[40.035 ms] INIT → THROW:</strong> 4 "seconds" = 4 × 1000 = 4000 clock cycles × 10 ns = 40 µs. The 35 ns offset is because the FSM checks <code>sec_count ≥ INIT_SECS - 1</code> (= 3) on the sec_tick edge, which has a small pipeline delay.</li>
+          <li><strong>[45.02 ms] Injecting THROW:</strong> The testbench drives Z_SPIKE (Z mag=15) for 2 µs, then REST, then X_SPIKE (X mag=15) for 2 µs. The Z spike triggers <code>z_rise_t</code> → <code>throw_armed=1</code>. The subsequent X spike triggers <code>x_rise_t</code> while armed → <strong>score +1!</strong></li>
+          <li><strong>[49.035 ms] SCORE 0→1:</strong> The throw gesture scored exactly as designed. The 4 µs delay from injection (45 µs) to scoring (49 µs) includes: Z spike duration (2 µs) + rest gap (2 µs) + X spike rising edge detection.</li>
+          <li><strong>[120.035 ms] THROW → PULL:</strong> 8 "seconds" after THROW started = 80 µs + the 40.035 ms offset.</li>
+          <li><strong>[128.035 ms] SCORE 1→2:</strong> First PULL gesture. X_PULL has mag=4, baseline is at mag=8 (REST Z). X_dev = |4 - 8| = 4 ≥ DTH_PULL(2), so <code>x_rise_p</code> fires.</li>
+          <li><strong>[132.035 ms] SCORE 2→3:</strong> Second PULL gesture. The 4 µs gap includes the 2 µs spike + rest + cooldown (250 cycles = 2.5 µs at CYCLES_PER_SEC=1000). Tight but enough for the second spike.</li>
+          <li><strong>[200.035 ms] PULL → TURN:</strong> 8 "seconds" after PULL started.</li>
+          <li><strong>[215.045 ms] SCORE 3→4:</strong> Y_POS → Y_NEG → Y_POS creates 2 sign flips. <code>turn_flips</code> reaches 2 → score +1. Y magnitudes are 15 (well above TH_MOVE=4 noise gate).</li>
+          <li><strong>[280.035 ms] TURN → DONE:</strong> 8 "seconds" after TURN started. Game over.</li>
+          <li><strong>FINAL SCORE = 4:</strong> 1 throw + 2 pulls + 1 turn = 4. [PASS] ✓</li>
+        </ol>
+      </div>
+
+      <div style="background:var(--bg); border-radius:8px; padding:12px; margin-top:12px;">
+        <h4 style="color:var(--accent2); margin-bottom:6px; font-size:0.9em;">How the Testbench Creates Gestures</h4>
+        <p style="color:var(--textdim); font-size:0.85em;">
+          The testbench directly drives the <code>acl_data</code> input bus using predefined constants:<br>
+          <code>REST = {0,0000,0,0000,0,1000}</code> (Z mag=8, simulating 1g gravity at rest)<br>
+          <code>Z_SPIKE = {0,0000,0,0000,0,1111}</code> (Z mag=15, big Z jerk)<br>
+          <code>X_SPIKE = {0,1111,0,0000,0,1000}</code> (X mag=15, big X thrust)<br>
+          <code>X_PULL = {0,0100,0,0000,0,1000}</code> (X mag=4, gentle pull)<br>
+          <code>Y_POS/Y_NEG</code> = Y mag=15 with sign toggling (rotation simulation).<br>
+          These are applied with precise timing using <code>#delay</code> statements to ensure they fall within the correct game phase.
+        </p>
+      </div>
+    </div>
+
+    <!-- KEY DESIGN INSIGHTS -->
+    <div style="background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--accent2); margin-bottom:20px;">
+      <h4 style="color:var(--accent2); margin-bottom:12px;">🧩 Key Design Insights — Why These Modules Work Together</h4>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="color:var(--textdim); font-size:0.9em;">
+          <strong style="color:var(--accent1);">1. Clock Domain Crossing:</strong><br>
+          SPI master runs at 4 MHz, action_fsm at 100 MHz. The <code>acl_data</code> bus is latched on the negative edge of iclk (4 MHz) inside spi_master, 
+          then sampled by action_fsm at 100 MHz. Since 100 MHz is 25× faster than 4 MHz, the data is stable for many action_fsm cycles before changing — no metastability risk.
+        </div>
+        <div style="color:var(--textdim); font-size:0.9em;">
+          <strong style="color:var(--accent4);">2. Parameterized Testability:</strong><br>
+          The <code>CYCLES_PER_SEC</code> parameter lets the testbench run the full 28-second game in ~300 µs of simulation time. 
+          All timing relationships are preserved (cooldowns, phase durations, baseline update rate all scale proportionally), 
+          so the testbench validates exactly the same logic as the real hardware.
+        </div>
+        <div style="color:var(--textdim); font-size:0.9em;">
+          <strong style="color:var(--accent3);">3. Edge Detection Pattern:</strong><br>
+          Both modules use 1-cycle-delayed copies to detect rising edges: <code>wire rise = signal & ~signal_d;</code>
+          This fires exactly once when a condition first becomes true, preventing continuous triggering while a gesture is held.
+        </div>
+        <div style="color:var(--textdim); font-size:0.9em;">
+          <strong style="color:var(--accent5);">4. Global Reset via SW0:</strong><br>
+          The <code>if (!start)</code> block at line 121 acts as a synchronous global reset — it takes priority over the entire <code>case (state)</code> statement. 
+          Flipping SW0 OFF from any state (even S_DONE) instantly clears score, timers, and returns to S_IDLE. This is how the player restarts the game.
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER SUMMARY TABLE -->
+    <div style="background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--border);">
+      <h4 style="color:var(--accent6); margin-bottom:12px;">📋 Complete Internal Register Summary</h4>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div>
+          <h5 style="color:var(--accent1); margin-bottom:8px;">spi_master.v Registers</h5>
+          <table class="styled-table" style="font-size:0.8em;">
+            <tr><td style="color:var(--accent1);">state_reg [6:0]</td><td>Current FSM state (0x00–0x5C)</td></tr>
+            <tr><td style="color:var(--accent1);">counter [31:0]</td><td>Global tick counter for timing</td></tr>
+            <tr><td style="color:var(--accent1);">clk_counter [0:0]</td><td>1→0→1 toggle for 1 MHz division</td></tr>
+            <tr><td style="color:var(--accent1);">clk_reg</td><td>1 MHz clock register</td></tr>
+            <tr><td style="color:var(--accent1);">sclk_control</td><td>Gate for SCLK output</td></tr>
+            <tr><td style="color:var(--accent1);">X [15:0]</td><td>Raw X-axis (LSB+MSB from ADXL362)</td></tr>
+            <tr><td style="color:var(--accent1);">Y [15:0]</td><td>Raw Y-axis</td></tr>
+            <tr><td style="color:var(--accent1);">Z [15:0]</td><td>Raw Z-axis</td></tr>
+            <tr><td style="color:var(--accent1);">temp_DATA [14:0]</td><td>Latched packed output</td></tr>
+          </table>
+        </div>
+        <div>
+          <h5 style="color:var(--accent4); margin-bottom:8px;">action_fsm.v Registers</h5>
+          <table class="styled-table" style="font-size:0.8em;">
+            <tr><td style="color:var(--accent4);">state [2:0]</td><td>Current FSM state (0–5)</td></tr>
+            <tr><td style="color:var(--accent4);">sec_cycle [31:0]</td><td>Counts up to CYCLES_PER_SEC-1</td></tr>
+            <tr><td style="color:var(--accent4);">sec_count [3:0]</td><td>Seconds elapsed in current phase</td></tr>
+            <tr><td style="color:var(--accent4);">cooldown [31:0]</td><td>Debounce countdown</td></tr>
+            <tr><td style="color:var(--accent4);">base_x, base_z [5:0]</td><td>Calibration baselines</td></tr>
+            <tr><td style="color:var(--accent4);">base_div [31:0]</td><td>Baseline update rate divider</td></tr>
+            <tr><td style="color:var(--accent4);">throw_armed</td><td>Z-spike seen flag (THROW phase)</td></tr>
+            <tr><td style="color:var(--accent4);">turn_flips [3:0]</td><td>Y/Z sign-flip counter</td></tr>
+            <tr><td style="color:var(--accent4);">y_last_sign, z_last_sign</td><td>Previous sign for flip detection</td></tr>
+            <tr><td style="color:var(--accent4);">y_seen, z_seen</td><td>First-sign-recorded flags</td></tr>
+            <tr><td style="color:var(--accent4);">x_spk_t_d, z_spk_t_d, x_spk_p_d</td><td>Edge detection delay registers</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END OF SPI MASTER & ACTION FSM DEEP DIVE -->
+
+<!-- ==================== 5. SPRITE ANIMATIONS ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🎬</span> Sprite Animation Frames</div>
+  <p style="color:var(--textdim); margin-bottom:20px;">Each motion has 3 frames (160×120 px, 12-bit grayscale) looping at ~6 FPS. Rendered below from the actual <code>.hex</code> files.</p>
+
+  <!-- THROW -->
+  <h3 style="color:#ef4444; margin:24px 0 12px; font-size:1.2em;">🤾 THROW — Forward Throwing Motion</h3>
+  <div class="sprite-row">
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(220,38,38,0.2); color:#ef4444;">Frame 1 — Wind Up</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-t1" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>throw_1vga.hex</h4>
+        <div class="stat">1,784 pixels &bull; Widest pose (x: 32–141)</div>
+        <div class="stat" style="color:#ef4444;">Arms raised, winding up for throw</div>
+      </div>
+    </div>
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(220,38,38,0.2); color:#ef4444;">Frame 2 — Extend</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-t2" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>throw_vga.hex</h4>
+        <div class="stat">1,737 pixels &bull; Body lean (x: 28–126)</div>
+        <div class="stat" style="color:#ef4444;">Arms thrust forward, body leaning in</div>
+      </div>
+    </div>
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(220,38,38,0.2); color:#ef4444;">Frame 3 — Follow Through</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-t3" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>throw_2vga.hex</h4>
+        <div class="stat">1,592 pixels &bull; Compact (x: 32–128)</div>
+        <div class="stat" style="color:#ef4444;">Post-throw follow-through pose</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PULL -->
+  <h3 style="color:#3b82f6; margin:24px 0 12px; font-size:1.2em;">💪 PULL — Pulling Backward Motion</h3>
+  <div class="sprite-row">
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(37,99,235,0.2); color:#3b82f6;">Frame 1 — Standing</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-p1" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>pull_1vga.hex</h4>
+        <div class="stat">1,127 pixels &bull; Narrow (x: 50–110)</div>
+        <div class="stat" style="color:#3b82f6;">Upright stance, arms at sides</div>
+      </div>
+    </div>
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(37,99,235,0.2); color:#3b82f6;">Frame 2 — Leaning Back</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-p2" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>pull_2vga.hex</h4>
+        <div class="stat">1,035 pixels &bull; (x: 49–110)</div>
+        <div class="stat" style="color:#3b82f6;">Body tilting, arms pulling behind</div>
+      </div>
+    </div>
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(37,99,235,0.2); color:#3b82f6;">Frame 3 — Crouched</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-p3" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>pull_3vga.hex</h4>
+        <div class="stat">743 pixels &bull; ⚡ SMALLEST frame of all 9</div>
+        <div class="stat" style="color:#3b82f6;">Fully crouched — extreme pull-back</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TURN -->
+  <h3 style="color:#22c55e; margin:24px 0 12px; font-size:1.2em;">🔄 TURN — Body Rotation Motion</h3>
+  <div class="sprite-row">
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(22,163,106,0.2); color:#22c55e;">Frame 1 — Forward</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-r1" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>turn_1vga.hex</h4>
+        <div class="stat">1,336 pixels &bull; Wide (84px spread)</div>
+        <div class="stat" style="color:#22c55e;">Facing forward, arms spread out</div>
+      </div>
+    </div>
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(22,163,106,0.2); color:#22c55e;">Frame 2 — Mid-Rotate</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-r2" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>turn_2vga.hex</h4>
+        <div class="stat">1,330 pixels &bull; Has color blend artifacts</div>
+        <div class="stat" style="color:#22c55e;">Body mid-twist, unique anti-aliased pixels</div>
+      </div>
+    </div>
+    <div class="sprite-card">
+      <div class="sprite-label" style="background:rgba(22,163,106,0.2); color:#22c55e;">Frame 3 — Sideways</div>
+      <div class="sprite-canvas-wrap"><canvas id="c-r3" width="160" height="120"></canvas></div>
+      <div class="sprite-info">
+        <h4>turn_3vga.hex</h4>
+        <div class="stat">1,119 pixels &bull; Narrowest (76px spread)</div>
+        <div class="stat" style="color:#22c55e;">Fully rotated sideways</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pixel count bar chart -->
+  <div style="margin-top:24px; background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--border);">
+    <h4 style="margin-bottom:16px;">Pixel Count Comparison</h4>
+    <div style="display:flex; align-items:flex-end; gap:8px; height:140px; padding-bottom:4px;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#dc2626,#ef4444); border-radius:6px 6px 0 0; height:calc(1784/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">T1</span>
+        <span style="font-size:0.7em; color:#ef4444;">1784</span>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#dc2626,#ef4444); border-radius:6px 6px 0 0; height:calc(1737/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">T2</span>
+        <span style="font-size:0.7em; color:#ef4444;">1737</span>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#dc2626,#ef4444); border-radius:6px 6px 0 0; height:calc(1592/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">T3</span>
+        <span style="font-size:0.7em; color:#ef4444;">1592</span>
+      </div>
+      <div style="flex:0.3;"></div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#2563eb,#3b82f6); border-radius:6px 6px 0 0; height:calc(1127/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">P1</span>
+        <span style="font-size:0.7em; color:#3b82f6;">1127</span>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#2563eb,#3b82f6); border-radius:6px 6px 0 0; height:calc(1035/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">P2</span>
+        <span style="font-size:0.7em; color:#3b82f6;">1035</span>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#2563eb,#3b82f6); border-radius:6px 6px 0 0; height:calc(743/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">P3</span>
+        <span style="font-size:0.7em; color:#3b82f6;">743</span>
+      </div>
+      <div style="flex:0.3;"></div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#16a34a,#22c55e); border-radius:6px 6px 0 0; height:calc(1336/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">R1</span>
+        <span style="font-size:0.7em; color:#22c55e;">1336</span>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#16a34a,#22c55e); border-radius:6px 6px 0 0; height:calc(1330/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">R2</span>
+        <span style="font-size:0.7em; color:#22c55e;">1330</span>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="width:100%; background:linear-gradient(#16a34a,#22c55e); border-radius:6px 6px 0 0; height:calc(1119/1784*120px);"></div>
+        <span style="font-size:0.7em; color:var(--textdim);">R3</span>
+        <span style="font-size:0.7em; color:#22c55e;">1119</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-around; margin-top:8px;">
+      <span style="color:#ef4444; font-weight:600; font-size:0.9em;">◆ THROW</span>
+      <span style="color:#3b82f6; font-weight:600; font-size:0.9em;">◆ PULL</span>
+      <span style="color:#22c55e; font-weight:600; font-size:0.9em;">◆ TURN</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 6. SCORING ALGORITHMS ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🎯</span> Scoring Algorithms — Visual Breakdown</div>
+
+  <!-- Baseline -->
+  <div class="scoring-block" style="border-color: var(--accent1);">
+    <h4 style="color:var(--accent1);">📐 Self-Calibrating Baseline</h4>
+    <p style="color:var(--textdim); margin-top:8px;">The baseline absorbs gravity and tilt so only <em>motion</em> (fast changes) triggers scoring. Without this, a tilted board would constantly false-trigger.</p>
+    <div class="wave" style="color:var(--accent1);">
+Accel   ┃         ████                 ← Gesture spike!
+Reading ┃        █    █
+        ┃       █      █          ████
+        ┃ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ←── Baseline (slow-tracking)
+        ┃ ▀▀▀▀▀▀        ▀▀▀▀▀▀▀▀▀      ▀▀▀▀  ← Gravity offset absorbed
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━► Time
+
+IDLE:     Baseline SNAPS to live reading (instant)
+GAMEPLAY: Baseline DRIFTS toward reading (1 step per 1/16 sec)
+    </div>
+  </div>
+
+  <!-- THROW scoring -->
+  <div class="scoring-block" style="border-color: #ef4444;">
+    <h4 style="color:#ef4444;">🤾 THROW — Two-Step Gesture (Threshold ≥ 5)</h4>
+    <p style="color:var(--textdim); margin-top:8px;">Requires Z-axis spike first (board jerks up/down), then X-axis spike (forward thrust). This prevents accidental scoring from single-axis bumps.</p>
+    <div class="wave" style="color:#ef4444;">
+Z-axis  ┃       ████                          Step 1: Z spike ARMS the throw
+ dev    ┃      █    █
+────────┃─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ← Threshold = 5
+        ┃ ▄▄▄▄▄      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+        ┃      ↑
+        ┃  throw_armed = 1 ✓
+
+X-axis  ┃                     ████            Step 2: X spike SCORES
+ dev    ┃                    █    █
+────────┃─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ← Threshold = 5
+        ┃ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄
+        ┃                         ↑
+        ┃                   ★ SCORE +1!    (armed=0, cooldown=0.25s)
+    </div>
+  </div>
+
+  <!-- PULL scoring -->
+  <div class="scoring-block" style="border-color: #3b82f6;">
+    <h4 style="color:#3b82f6;">💪 PULL — Single Spike (Threshold ≥ 2) — EASIEST</h4>
+    <p style="color:var(--textdim); margin-top:8px;">Any X-axis deviation from baseline scores. Low threshold and single-spike detection makes this the most generous phase.</p>
+    <div class="wave" style="color:#3b82f6;">
+X-axis  ┃     ███       ███              ███
+ dev    ┃    █   █     █   █            █   █
+────────┃─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ← Threshold = 2 (LOW!)
+        ┃ ▄▄▄     ▄▄▄▄▄     ▄▄▄▄▄▄▄▄▄▄     ▄
+        ┃    ↑         ↑                ↑
+        ┃  ★ +1      ★ +1            ★ +1
+        ┃  │←─0.25s─►│
+        ┃   cooldown
+    </div>
+  </div>
+
+  <!-- TURN scoring -->
+  <div class="scoring-block" style="border-color: #22c55e;">
+    <h4 style="color:#22c55e;">🔄 TURN — Sign-Flip Counter (2 flips = 1 point)</h4>
+    <p style="color:var(--textdim); margin-top:8px;">Counts direction changes on Y and Z axes. Rotating the board back and forth creates sign flips. Only counted when magnitude ≥ 4 (noise gate).</p>
+    <div class="wave" style="color:#22c55e;">
+Y sign  ┃  + + + - - - + + + - - -     Flip at each + ↔ - transition
+        ┃          ↑           ↑
+        ┃        flip 1      flip 2
+
+Z sign  ┃  + + - - - + + + - - -       Y and Z flips are POOLED
+        ┃        ↑       ↑
+        ┃      flip 1  flip 2
+
+Counter ┃  0 → 1 → 2 → ★ SCORE! → 0 → 1 → 2 → ★ SCORE! → 0 → ...
+        ┃              ↑ reset             ↑ reset
+        ┃          +1 point            +1 point + 0.25s cooldown
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 7. DATA FLOW ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">📡</span> SPI & Data Flow</div>
+
+  <div style="background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--border); margin-bottom:20px;">
+    <h4 style="margin-bottom:12px;">Accelerometer Data Packing (15-bit bus)</h4>
+    <div style="display:flex; gap:4px; margin:16px 0; flex-wrap:wrap;">
+      <div style="display:flex; gap:2px;">
+        <div style="background:#ef4444; color:#fff; padding:8px 6px; border-radius:6px 0 0 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:36px;">14<br><span style="font-size:0.7em;">±</span></div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">13</div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">12</div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">11</div>
+        <div style="background:#dc2626; color:#fff; padding:8px 6px; border-radius:0 6px 6px 0; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">10</div>
+      </div>
+      <div style="display:flex; gap:2px;">
+        <div style="background:#3b82f6; color:#fff; padding:8px 6px; border-radius:6px 0 0 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:36px;">9<br><span style="font-size:0.7em;">±</span></div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">8</div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">7</div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">6</div>
+        <div style="background:#2563eb; color:#fff; padding:8px 6px; border-radius:0 6px 6px 0; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">5</div>
+      </div>
+      <div style="display:flex; gap:2px;">
+        <div style="background:#22c55e; color:#fff; padding:8px 6px; border-radius:6px 0 0 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:36px;">4<br><span style="font-size:0.7em;">±</span></div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">3</div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">2</div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">1</div>
+        <div style="background:#16a34a; color:#fff; padding:8px 6px; border-radius:0 6px 6px 0; font-size:0.8em; font-weight:700; text-align:center; min-width:28px;">0</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.9em;">
+      <span style="color:#ef4444;">■ X axis (sign + 4 mag)</span>
+      <span style="color:#3b82f6;">■ Y axis (sign + 4 mag)</span>
+      <span style="color:#22c55e;">■ Z axis (sign + 4 mag)</span>
+    </div>
+  </div>
+
+  <div style="background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--border);">
+    <h4 style="margin-bottom:12px;">SPI Transaction Sequence</h4>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="background:#475569; color:#fff; padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.85em; white-space:nowrap;">1. POWER UP</div>
+        <div style="flex:1; height:2px; background:var(--border);"></div>
+        <span style="color:var(--textdim); font-size:0.85em;">Wait 6 ms for sensor standby</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="background:#2563eb; color:#fff; padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.85em; white-space:nowrap;">2. SPI WRITE</div>
+        <div style="flex:1; height:2px; background:var(--border);"></div>
+        <span style="color:var(--textdim); font-size:0.85em;">Send 0x0A → 0x2D → 0x02 (measurement mode)</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="background:#475569; color:#fff; padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.85em; white-space:nowrap;">3. WAIT</div>
+        <div style="flex:1; height:2px; background:var(--border);"></div>
+        <span style="color:var(--textdim); font-size:0.85em;">Wait 40 ms for first valid data</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="background:#16a34a; color:#fff; padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.85em; white-space:nowrap;">4. SPI READ ↻</div>
+        <div style="flex:1; height:2px; background:var(--border);"></div>
+        <span style="color:var(--textdim); font-size:0.85em;">Read 6 bytes (X/Y/Z LSB+MSB) → wait 10 ms → repeat @ 100 Hz</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 8. AUDIO ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🎵</span> Audio Engine</div>
+
+  <div class="card-grid">
+    <div class="card" style="border-top:3px solid #64748b;">
+      <h3>🔇 HOLD (Idle)</h3>
+      <p>Complete silence — all generators output 0</p>
+    </div>
+    <div class="card" style="border-top:3px solid #475569;">
+      <h3>🔔 COUNTDOWN</h3>
+      <p>Short 25ms beep tick (1 kHz) each beat</p>
+      <div style="margin-top:8px;">
+        <span class="note-bar" style="background:#facc15; width:20px; height:30px;"></span>
+        <span class="note-bar" style="background:#333; width:40px; height:10px;"></span>
+        <span class="note-bar" style="background:#facc15; width:20px; height:30px;"></span>
+        <span class="note-bar" style="background:#333; width:40px; height:10px;"></span>
+        <span class="note-bar" style="background:#facc15; width:20px; height:30px;"></span>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #a78bfa;">
+      <h3>🎶 Verse Melody</h3>
+      <p>States 2–3: E4-G4-A4-C5-D5 pattern + drum rhythm</p>
+      <p style="margin-top:4px; font-size:0.85em;">Tempo: 166ms/beat</p>
+      <div style="margin-top:8px;">
+        <span class="note-bar" style="background:#a78bfa; width:18px; height:25px;">E4</span>
+        <span class="note-bar" style="background:#a78bfa; width:18px; height:25px;">E4</span>
+        <span class="note-bar" style="background:#333; width:18px; height:8px;"></span>
+        <span class="note-bar" style="background:#a78bfa; width:18px; height:25px;">E4</span>
+        <span class="note-bar" style="background:#c084fc; width:18px; height:32px;">G4</span>
+        <span class="note-bar" style="background:#c084fc; width:18px; height:32px;">G4</span>
+        <span class="note-bar" style="background:#333; width:18px; height:8px;"></span>
+        <span class="note-bar" style="background:#c084fc; width:18px; height:32px;">G4</span>
+        <span class="note-bar" style="background:#d8b4fe; width:18px; height:38px;">A4</span>
+        <span class="note-bar" style="background:#d8b4fe; width:18px; height:38px;">A4</span>
+        <span class="note-bar" style="background:#d8b4fe; width:18px; height:38px;">A4</span>
+        <span class="note-bar" style="background:#e9d5ff; width:18px; height:45px;">C5</span>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #ef4444;">
+      <h3>🎺 Build-Up (Gameplay)</h3>
+      <p>States 5–7: Ode to Joy pattern, no drums</p>
+      <p style="margin-top:4px; font-size:0.85em;">Tempo: 250ms/beat (slower = dramatic)</p>
+      <div style="margin-top:8px;">
+        <span class="note-bar" style="background:#ef4444; width:18px; height:40px;">E5</span>
+        <span class="note-bar" style="background:#ef4444; width:18px; height:40px;">E5</span>
+        <span class="note-bar" style="background:#f87171; width:18px; height:43px;">F5</span>
+        <span class="note-bar" style="background:#fca5a5; width:18px; height:48px;">G5</span>
+        <span class="note-bar" style="background:#fca5a5; width:18px; height:48px;">G5</span>
+        <span class="note-bar" style="background:#f87171; width:18px; height:43px;">F5</span>
+        <span class="note-bar" style="background:#ef4444; width:18px; height:40px;">E5</span>
+        <span class="note-bar" style="background:#dc2626; width:18px; height:35px;">D5</span>
+        <span class="note-bar" style="background:#b91c1c; width:18px; height:30px;">C5</span>
+        <span class="note-bar" style="background:#b91c1c; width:18px; height:30px;">C5</span>
+        <span class="note-bar" style="background:#dc2626; width:18px; height:35px;">D5</span>
+        <span class="note-bar" style="background:#ef4444; width:18px; height:40px;">E5</span>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #facc15;">
+      <h3>🏆 Victory Arpeggio</h3>
+      <p>Result screen: C4→E4→G4→C5 loop</p>
+      <p style="margin-top:4px; font-size:0.85em;">Tempo: 166ms/beat</p>
+      <div style="margin-top:8px;">
+        <span class="note-bar" style="background:#a16207; width:30px; height:20px;">C4</span>
+        <span class="note-bar" style="background:#ca8a04; width:30px; height:30px;">E4</span>
+        <span class="note-bar" style="background:#eab308; width:30px; height:40px;">G4</span>
+        <span class="note-bar" style="background:#facc15; width:30px; height:55px;">C5</span>
+        <span style="color:var(--textdim); font-size:0.8em; margin-left:8px;">↻ repeat</span>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent1);">
+      <h3>🔊 Mixing Pipeline</h3>
+      <p>3 channels summed into 2-bit PWM DAC:</p>
+      <ul>
+        <li><strong>Melody</strong> — note_generator (square wave)</li>
+        <li><strong>SFX</strong> — note_generator (beep ticks)</li>
+        <li><strong>Drum</strong> — tempo_counter[14] toggle</li>
+      </ul>
+      <p style="margin-top:8px;">80% sound / 20% mute = staccato articulation</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 9. VGA DISPLAY ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🖥️</span> VGA Display Pipeline</div>
+
+  <div style="background:var(--card); border-radius:14px; padding:24px; border:1px solid var(--border); margin-bottom:20px;">
+    <h4 style="margin-bottom:16px;">Screen Composition (Priority Order)</h4>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:80px; text-align:center; padding:8px; background:#fff; color:#000; border-radius:8px; font-weight:700; font-size:0.85em;">P1: White</div>
+        <span style="color:var(--textdim);">Menu / countdown text (states 0–4)</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:80px; text-align:center; padding:8px; background:#ff0; color:#000; border-radius:8px; font-weight:700; font-size:0.85em;">P2: Yellow</div>
+        <span style="color:var(--textdim);">Result screen text (state 6) — "RESULT" + "SCORE: XX"</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:80px; text-align:center; padding:8px; background:linear-gradient(135deg,#666,#aaa); color:#000; border-radius:8px; font-weight:700; font-size:0.85em;">P3: Sprite</div>
+        <span style="color:var(--textdim);">Character animation from IMAGE_ROM (state 5 gameplay)</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:80px; text-align:center; padding:8px; background:#000; color:#fff; border:1px solid #475569; border-radius:8px; font-weight:700; font-size:0.85em;">P4: Black</div>
+        <span style="color:var(--textdim);">Background (everywhere else)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3><span class="tag tag-violet">VGA.v</span> Timing Generator</h3>
+      <p>640×480 @ 60 Hz, 25 MHz pixel clock</p>
+      <table class="styled-table" style="margin-top:12px;">
+        <tr><th></th><th>Display</th><th>F.Porch</th><th>Sync</th><th>B.Porch</th><th>Total</th></tr>
+        <tr><td style="font-weight:600;">H</td><td>640</td><td>16</td><td>96</td><td>48</td><td>800</td></tr>
+        <tr><td style="font-weight:600;">V</td><td>480</td><td>10</td><td>2</td><td>33</td><td>525</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-pink">4× Scale</span> Sprite Rendering</h3>
+      <p>Each 160×120 ROM pixel maps to a 4×4 block on screen:</p>
+      <div style="font-family:monospace; font-size:0.85em; margin-top:8px; background:var(--bg); padding:12px; border-radius:8px;">
+        rom_addr = (vga_y >> 2) × 160<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ (vga_x >> 2)
+      </div>
+      <p style="margin-top:8px;">160×4 = 640, 120×4 = 480 → fills entire screen</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 10. MODULE TABLE ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">📦</span> All Modules at a Glance</div>
+  <table class="styled-table">
+    <thead>
+      <tr><th>Module</th><th>File</th><th>Role</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="color:var(--accent1); font-weight:600;">master_game_top</td><td>master_game_top.v</td><td>Top-level: wires all subsystems</td><td><span class="tag tag-emerald">Active Top</span></td></tr>
+      <tr><td style="color:var(--accent3); font-weight:600;">iclk_gen</td><td>iclk_gen.v</td><td>100 MHz → 4 MHz clock divider</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent1); font-weight:600;">spi_master</td><td>spi_master.v</td><td>ADXL362 SPI driver (93-state FSM)</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent4); font-weight:600;">action_fsm</td><td>action_fsm.v</td><td>Game logic FSM + scoring</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent5); font-weight:600;">seg7_control</td><td>seg7_control.v</td><td>7-segment multiplexer</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent2); font-weight:600;">VGA_TEST</td><td>VGA_TEST.v</td><td>VGA top: sprites + UI + state machine</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent2); font-weight:600;">VGA</td><td>VGA.v</td><td>VGA timing (640×480 @ 60 Hz)</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent5); font-weight:600;">IMAGE_ROM</td><td>IMAGE_ROM.v</td><td>Parameterized sprite BRAM (×9 inst)</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent2); font-weight:600;">UI_TEXT_ENGINE</td><td>UI_TEXT_ENGINE.v</td><td>8×8 bitmap font renderer</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent6); font-weight:600;">main_game_audio_processor</td><td>main_game_audio_processor.v</td><td>PWM audio + melody sequencer</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:var(--accent6); font-weight:600;">note_generator</td><td>main_game_audio_processor.v</td><td>Square wave oscillator (×2 inst)</td><td><span class="tag tag-emerald">Active</span></td></tr>
+      <tr><td style="color:#64748b;">scoring_design</td><td>scoring_design.v</td><td>Old scoring system (absolute thresholds)</td><td><span class="tag" style="background:rgba(100,116,139,0.2); color:#94a3b8;">Legacy</span></td></tr>
+      <tr><td style="color:#64748b;">top</td><td>top.v</td><td>Old top module (no VGA/audio)</td><td><span class="tag" style="background:rgba(100,116,139,0.2); color:#94a3b8;">Legacy</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== 11. CLOCK DOMAINS ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">⏰</span> Clock Domains</div>
+  <div style="display:flex; flex-wrap:wrap; gap:16px;">
+    <div style="flex:1; min-width:250px; background:var(--card); border-radius:14px; padding:20px; border-left:4px solid #38bdf8;">
+      <h4 style="color:#38bdf8;">100 MHz — Primary</h4>
+      <p style="color:var(--textdim); font-size:0.9em; margin-top:8px;">action_fsm, seg7_control, VGA, VGA_TEST, audio_processor, note_gen, iclk_gen</p>
+    </div>
+    <div style="flex:1; min-width:250px; background:var(--card); border-radius:14px; padding:20px; border-left:4px solid #34d399;">
+      <h4 style="color:#34d399;">4 MHz — SPI Domain</h4>
+      <p style="color:var(--textdim); font-size:0.9em; margin-top:8px;">spi_master (bit-bang FSM) → derives 1 MHz SCLK internally</p>
+    </div>
+    <div style="flex:1; min-width:250px; background:var(--card); border-radius:14px; padding:20px; border-left:4px solid #a78bfa;">
+      <h4 style="color:#a78bfa;">25 MHz — Pixel Clock</h4>
+      <p style="color:var(--textdim); font-size:0.9em; margin-top:8px;">Internal to VGA module only (h_count/v_count advance on pixel_tick)</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 12. BUILD STEPS ==================== -->
+<div class="section">
+  <div class="section-title"><span class="icon">🔨</span> Build & Program</div>
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="background:var(--accent1); color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">1</div>
+      <div style="background:var(--card); padding:16px 20px; border-radius:12px; flex:1; border:1px solid var(--border);">
+        <strong>Open Project</strong> — <code>KKEE2163_Digital_Electronics_Project.xpr</code> in Vivado 2024.1+
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="background:var(--accent2); color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">2</div>
+      <div style="background:var(--card); padding:16px 20px; border-radius:12px; flex:1; border:1px solid var(--border);">
+        <strong>Verify Top Module</strong> — <code>master_game_top</code> should be bold in Sources panel
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="background:var(--accent3); color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">3</div>
+      <div style="background:var(--card); padding:16px 20px; border-radius:12px; flex:1; border:1px solid var(--border);">
+        <strong>Generate Bitstream</strong> — Run Synthesis → Implementation → Generate Bitstream (5–15 min)
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="background:var(--accent4); color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">4</div>
+      <div style="background:var(--card); padding:16px 20px; border-radius:12px; flex:1; border:1px solid var(--border);">
+        <strong>Program FPGA</strong> — USB cable → Hardware Manager → Program Device
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div style="background:var(--accent5); color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0;">5</div>
+      <div style="background:var(--card); padding:16px 20px; border-radius:12px; flex:1; border:1px solid var(--border);">
+        <strong>Connect & Play</strong> — VGA monitor + optional speakers → flip SW0 UP to start!
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- ==================== SPRITE RENDERER ==================== -->
+<script>
+// Render hex sprites to canvases
+const sprites = {
+  'c-t1': 'throw_1vga.hex', 'c-t2': 'throw_vga.hex', 'c-t3': 'throw_2vga.hex',
+  'c-p1': 'pull_1vga.hex',  'c-p2': 'pull_2vga.hex',  'c-p3': 'pull_3vga.hex',
+  'c-r1': 'turn_1vga.hex',  'c-r2': 'turn_2vga.hex',  'c-r3': 'turn_3vga.hex'
+};
+
+Object.entries(sprites).forEach(([canvasId, filename]) => {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.style.width = '240px';
+  canvas.style.height = '180px';
+
+  fetch(filename)
+    .then(r => r.text())
+    .then(text => {
+      const lines = text.trim().split('\n');
+      const imgData = ctx.createImageData(160, 120);
+      for (let i = 0; i < Math.min(lines.length, 19200); i++) {
+        const hex = lines[i].trim();
+        const r = parseInt(hex[0], 16) * 17;
+        const g = parseInt(hex[1], 16) * 17;
+        const b = parseInt(hex[2], 16) * 17;
+        imgData.data[i*4]   = r;
+        imgData.data[i*4+1] = g;
+        imgData.data[i*4+2] = b;
+        imgData.data[i*4+3] = (r||g||b) ? 255 : 0;
+      }
+      ctx.putImageData(imgData, 0, 0);
+    })
+    .catch(() => {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, 160, 120);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Open via local server', 80, 55);
+      ctx.fillText('to view sprites', 80, 70);
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI Trading Arena">
+  <!-- Brand badge -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="#141413"/>
+  <!-- Three competitors as ascending chart bars in the brand accents -->
+  <rect x="14" y="38" width="8" height="12" rx="3" fill="#d97757"/>
+  <rect x="28" y="28" width="8" height="22" rx="3" fill="#6a9bcc"/>
+  <rect x="42" y="18" width="8" height="32" rx="3" fill="#788c5d"/>
+  <!-- Upward trend line linking the leaders -->
+  <polyline points="18,38 32,28 46,18" fill="none" stroke="#faf9f5"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="18" cy="38" r="2.6" fill="#faf9f5"/>
+  <circle cx="32" cy="28" r="2.6" fill="#faf9f5"/>
+  <circle cx="46" cy="18" r="2.6" fill="#faf9f5"/>
+</svg>

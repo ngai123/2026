@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Runtime data
+rescue_mission.db
+
+# OS
+.DS_Store
+
+# Secrets
+.env

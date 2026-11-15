@@ -1,0 +1,29 @@
+==========================================================
+ tb_spi_master : ADXL362 SPI driver simulation
+ Master clock (iclk) = 4 MHz (250 ns period)
+ Expected packed acl_data = 0x0C43 (X=3, Y=2, Z=3)
+==========================================================
+[6000625000 ns] CS pulled LOW  (SPI transaction begin)
+[6024625000 ns] CS released HIGH
+[46025875000 ns] CS pulled LOW  (SPI transaction begin)
+[46089625000 ns] CS released HIGH
+[56090875000 ns] CS pulled LOW  (SPI transaction begin)
+[56154625000 ns] CS released HIGH
+----------------------------------------------------------
+ @65 ms  acl_data = 15'h0c43  (X=3 Y=2 Z=3)
+   DUT raw regs: X=0x0180 Y=0x8140 Z=0x01c0  state=0x5c
+   (expected: X=0x0180 Y=0x8140 Z=0x01C0)
+   [PASS] SPI master correctly captured all 6 accel bytes.
+[66155875000 ns] CS pulled LOW  (SPI transaction begin)
+[66219625000 ns] CS released HIGH
+[76220875000 ns] CS pulled LOW  (SPI transaction begin)
+[76284625000 ns] CS released HIGH
+[86285875000 ns] CS pulled LOW  (SPI transaction begin)
+[86349625000 ns] CS released HIGH
+[96350875000 ns] CS pulled LOW  (SPI transaction begin)
+[96414625000 ns] CS released HIGH
+ @105 ms acl_data = 15'h0c43
+==========================================================
+ tb_spi_master DONE
+==========================================================
+tb_spi_master.v:192: $finish called at 105000000000 (1ps)

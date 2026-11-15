@@ -1,0 +1,136 @@
+# Robot spec — differential-drive variant (v1).
+# All units: SI (m, kg, rad, s).
+# Every number that appears in scripts/build_robot.py is read from here.
+#
+# NI ARC 2026 Autonomous Hoops rulebook constraints:
+#   - Max footprint 0.70 m × 0.70 m × 0.70 m
+#   - Max mass 15 kg
+#   - Controller: NI myRIO (LabVIEW)
+#
+# Mass budget (approximate):
+#   chassis box       6.00 kg   (electronics + battery + frame)
+#   2 drive wheels    0.80 kg   (0.40 each)
+#   2 caster balls    0.10 kg   (0.05 each)
+#   intake roller     0.20 kg
+#   2 flywheels       0.40 kg   (0.20 each)
+#   pitch arm         0.30 kg   (estimate — arm + structure holding flywheels)
+#   camera placeholder 0.10 kg
+#   ─────────────────────────
+#   total             7.90 kg   (well under 15 kg limit)
+
+chassis:
+  length_m:    0.50   # along robot X (forward)
+  width_m:     0.40   # along robot Y (left-right) — narrowed so drive wheels mount outside
+  height_m:    0.20   # along robot Z (up)
+  ground_clearance_m: 0.02   # chassis bottom is 20 mm above floor
+  mass_kg:     6.00
+  color:       "#336699"   # steel blue
+  # Centre of mass is at geometric centre of the box (by default).
+  # Battery pack sits low; electronics board sits mid-height.
+
+drive:
+  type: differential   # two powered side wheels + passive casters
+
+  wheels:
+    radius_m:      0.075
+    hub_width_m:   0.04
+    mass_kg:       0.40
+    color:         "#222222"
+    # Wheels are placed at the chassis centre-length (X=0) and mounted OUTSIDE
+    # the chassis side walls. Wheelbase must therefore exceed chassis width.
+    wheelbase_m:   0.46     # centre-to-centre — clears chassis (0.40) + hub (0.04) + 1 cm
+    # Motor limits (velocity-controlled).
+    ctrl_range:    [-30.0, 30.0]   # rad/s — maps to HAL set_chassis_velocity
+    gear:          1.0
+    max_torque:    2.0       # N·m — generous for a 15 kg bot on banner floor
+
+  casters:
+    radius_m:    0.025
+    mass_kg:     0.05
+    color:       "#666666"
+    # Placement: two casters on the chassis centre-line (Y=0),
+    # one near the front face and one near the back face.
+    front_offset_m:   0.22   # +X from chassis centre (toward front)
+    back_offset_m:   -0.22   # -X from chassis centre (toward back)
+    # Height: caster centre sits at chassis bottom + caster radius.
+    # In MJCF this is handled by placing the body relative to the chassis body.
+
+intake:
+  # Wide horizontal roller bar at the FRONT of the robot.
+  # Spinning roller pulls balls in toward the chassis.
+  roller:
+    length_m:    0.40   # along robot Y axis
+    radius_m:    0.025
+    mass_kg:     0.20
+    color:       "#CC4444"
+    # Placement relative to chassis front face.
+    # Chassis front face is at local X = +chassis.length_m/2.
+    front_offset_m:   0.05   # how far in front of the chassis face
+    height_above_floor_m: 0.05   # roller axis height above the floor
+    # Motor limits.
+    ctrl_range:  [-60.0, 60.0]   # rad/s — intake engage/disengage
+    gear:        1.0
+    max_torque:  1.0
+    # Friction on roller surface — high enough to grip foam balls.
+    friction:    [1.5, 0.01, 0.001]   # slide, roll, twist
+
+launcher:
+  # Dual horizontal flywheel pair on a pitch-adjustable arm.
+  # Yaw is fixed for v1 (shooting straight ahead of the arm).
+  type: dual_flywheel
+
+  flywheels:
+    radius_m:      0.06
+    hub_width_m:   0.025
+    mass_kg:       0.20
+    color:         "#DD8800"
+    separation_m:  0.18     # centre-to-centre between left and right flywheel
+    # Motor limits — flywheels spin fast to launch balls.
+    ctrl_range:    [0.0, 600.0]   # rad/s — maps to HAL launcher_charge
+    gear:          1.0
+    max_torque:    3.0       # N·m
+
+  pitch_arm:
+    # Hinge axis is horizontal across the back of the chassis at z = 0.20 m.
+    # The arm extends forward/upward from the hinge to the flywheel centre.
+    hinge_z_m:        0.20   # height of hinge axis above ground
+    arm_length_m:     0.20   # hinge centre to flywheel pair centre
+    pitch_min_deg:    10.0   # from horizontal
+    pitch_max_deg:    70.0   # from horizontal
+    pitch_default_deg: 30.0  # start angle
+    mass_kg:          0.30   # arm structure mass
+    color:            "#886644"
+    # Position-controlled actuator.
+    kp:               50.0   # position gain
+    ctrl_range:       [-1.5708, 1.2217]   # rad — rough range for 10–70 deg
+
+camera_placeholder:
+  # Sim-cheated forward camera: HAL reads ball positions directly from sim.
+  # This geom is purely visual — a small box on top of the chassis marking
+  # where a physical camera would sit. NOT a real sensor in v1.
+  size_xyz_m:  [0.04, 0.04, 0.03]
+  mass_kg:     0.10
+  color:       "#444444"
+  # Placed on top of chassis, toward the front.
+  offset_xyz_m: [0.15, 0.0, 0.115]   # relative to chassis centre
+
+# ---------------------------------------------------------------------------
+# HAL method mapping (for LabVIEW portability reference)
+# ---------------------------------------------------------------------------
+# Each actuator/sensor below maps to a HAL method defined in brain/hal.py.
+# The MJCF actuator name encodes the HAL method it serves.
+#
+# Actuators (write side):
+#   wheel_left  / wheel_right    → set_chassis_velocity(left_rad_s, right_rad_s)
+#   intake_roller                → intake_engage(duty)   (positive = pull in)
+#   flywheel_left / flywheel_right → launcher_charge(left_rpm, right_rpm)
+#   pitch_arm                    → launcher_aim(pitch_deg)
+#   (launcher_fire is a sim event: eject ball with computed velocity — no actuator)
+#
+# Sensors (read side):
+#   wheel_left / wheel_right qpos → read_encoders() → (left_rad, right_rad)
+#   IMU (auto via MuJoCo)         → read_imu() → (yaw_rad, yaw_rate_rad_s)
+#   intake_beam (sim sensor)      → read_intake_beam() → bool
+#   camera placeholder            → read_camera_balls() → list[(bearing, dist, golden)]
+#                                   (implemented in perception.py by querying sim,
+#                                    not by MJCF sensor — placeholder geom is visual only)
