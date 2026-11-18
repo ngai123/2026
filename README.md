@@ -14,6 +14,7 @@ Master directory for all 2026 projects — self projects and open-source forks.
 | `ML_Tutorial` | Machine learning tutorial for engineers (school project) |
 | `Digital_Ngai` | Personal Android "digital mirror" app — todos, journal, voice control (Kotlin) |
 | `duan-yongping-xueqiu-archive` | 段永平 (大道无形我有型) Xueqiu post archive, 2011-03-24 → 2026-06-28, 10,712 posts |
+| `Nyonyaverse` | Nyonyaverse (UKM) pitch slide deck — 18 slides, HTML player (open `index.html`) |
 
 ## Open source (forks)
 

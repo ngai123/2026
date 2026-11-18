@@ -1,0 +1,18 @@
+Nyonyaverse slides (18 slides)
+
+HOW TO OPEN
+1. Unzip this file (right-click > Extract All on Windows, double-click on Mac).
+2. Open the folder "Nyonyaverse-Slides" and double-click index.html.
+   It opens in Chrome, Edge or Safari. No internet and no install needed.
+   Keep all the files together in the same folder.
+
+KEYS
+  Right arrow or Space : play to the next slide
+  Left arrow           : play back to the previous slide
+  F                    : full screen
+  L                    : auto loop on / off (each slide stays 7 seconds)
+  Type a number (e.g. 7): jump straight to that slide (0 = the very start)
+  Move the mouse       : shows the slide-number bar, full-screen and loop buttons
+
+ALSO INSIDE
+  Nyonyaverse-Financial-Statements.xlsx : the Profit & Loss and Balance Sheet shown in slides 17-18
