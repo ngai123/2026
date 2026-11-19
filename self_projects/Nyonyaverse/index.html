@@ -9,23 +9,36 @@ body.idle #bar{opacity:0;pointer-events:none}
 #bar button:hover{background:rgba(255,255,255,.25)}
 #bar button.cur{background:#f2b63c;color:#111}
 #bar .sep{width:1px;height:24px;background:rgba(255,255,255,.25);margin:0 4px}
+#wait{position:fixed;left:22px;top:18px;z-index:10;color:#fff;font-size:18px;font-weight:700;opacity:.8;text-shadow:0 2px 8px #000;display:none}
 #num{position:fixed;right:22px;top:18px;z-index:10;color:#fff;font-size:44px;font-weight:800;text-shadow:0 2px 10px #000;display:none}
-</style></head><body class="idle"><div id="bar"></div><div id="num"></div><script>
+</style></head><body class="idle"><div id="bar"></div><div id="num"></div><div id="wait">loading…</div><script>
 /* → 或 空格：播到下一个画面。←：倒放回上一个画面。F 或「全屏」按钮：全屏。L 或「循环」按钮：自动循环（每页停 7 秒），再按一次停。
    跳到指定页：动一下鼠标，底下出现一排页码，点哪页就直接到那一页的结束画面（0＝最开头）；或者直接在键盘上打页码数字（比如 1 2），停半秒自动跳。
    加新的一页：把 sN.mp4 和 sNr.mp4（倒放）放进这个文件夹，N 改大。 */
 const N = 18; let k = 0, busy = false; const F = [], R = [];
-for (let i = 1; i <= N; i++) for (const [arr, suf] of [[F, ''], [R, 'r']]) { const v = document.createElement('video'); v.src = `s${i}${suf}.mp4`; v.muted = true; v.playsInline = true; v.preload = 'auto'; document.body.appendChild(v); arr[i] = v; }
+for (let i = 1; i <= N; i++) for (const [arr, suf] of [[F, ''], [R, 'r']]) { const v = document.createElement('video'); v.src = `s${i}${suf}.mp4`; v.muted = true; v.playsInline = true; v.preload = i <= 3 ? 'auto' : 'metadata'; document.body.appendChild(v); arr[i] = v; }
 const show = v => { for (const x of document.querySelectorAll('video')) x.classList.toggle('on', x === v); };
 const mark = () => { for (const b of document.querySelectorAll('#bar button[data-k]')) b.classList.toggle('cur', +b.dataset.k === k); };
 F[1].addEventListener('loadeddata', () => show(F[1]), { once: true });
-const run = (v, done) => { busy = true; const go = () => { show(v); v.play().catch(() => { busy = false; }); }; v.onended = () => { busy = false; done(); mark(); tick(); };
-  if (v.currentTime > 0) { v.addEventListener('loadeddata', go, { once: true }); v.load(); } else v.readyState >= 2 ? go() : v.addEventListener('loadeddata', go, { once: true }); };
-const next = () => { if (busy || k >= N) return; run(F[k + 1], () => k++); };
-const prev = () => { if (busy || k <= 0) return; run(R[k], () => k--); };
+/* 线上版（11-19 他说 cannot press next）：网络慢时视频还没下载完，旧版会一直卡在「播放中」不理按键。
+   现在：播放中再按 → / ← 会直接跳到这段的结束画面；最多等「片长＋4 秒」自动收尾；附近几页优先下载；点画面或手机左右滑也能翻页。 */
+let cur = null, fin = null, guard;
+const wait = document.getElementById('wait');
+const warm = () => { for (const v of [F[k + 1], F[k + 2], R[k], R[k - 1]]) if (v && v.preload !== 'auto') { v.preload = 'auto'; v.load(); } };
+const run = (v, done) => { busy = true; cur = v; let ended = false;
+  fin = () => { if (ended) return; ended = true; clearTimeout(guard); wait.style.display = 'none'; v.onended = null; v.pause();
+    const end = () => { show(v); busy = false; cur = null; fin = null; done(); mark(); warm(); tick(); };
+    const t = Math.max(0, (v.duration || 0) - .02); if (v.readyState >= 1 && Math.abs(v.currentTime - t) > .05) { v.addEventListener('seeked', end, { once: true }); v.currentTime = t; } else end(); };
+  v.onended = fin;
+  const go = () => { if (ended) return; wait.style.display = 'none'; show(v); v.play().catch(() => fin()); clearTimeout(guard); guard = setTimeout(fin, ((v.duration || 4) + 4) * 1000); };
+  const start = () => { if (v.currentTime > .01) { v.addEventListener('seeked', go, { once: true }); v.currentTime = 0; } else go(); };
+  if (v.preload !== 'auto') { v.preload = 'auto'; v.load(); }
+  if (v.readyState >= 3) start(); else { wait.style.display = 'block'; v.addEventListener('canplay', start, { once: true }); guard = setTimeout(fin, 20000); } };
+const next = () => { if (busy) { if (fin) fin(); return; } if (k >= N) return; run(F[k + 1], () => k++); };
+const prev = () => { if (busy) { if (fin) fin(); return; } if (k <= 0) return; run(R[k], () => k--); };
 /* 直接跳到第 j 页的结束画面（j＝0 是最开头）：把那一页的正放视频定到最后一帧显示出来 */
 const jump = (j, after) => { if (busy || j < 0 || j > N) return; busy = true; const v = F[Math.max(1, j)]; v.onended = null; v.pause();
-  const seek = () => { const t = j === 0 ? 0 : Math.max(0, v.duration - .02); const fin = () => { show(v); k = j; busy = false; mark(); if (after) after(); else tick(); };
+  const seek = () => { const t = j === 0 ? 0 : Math.max(0, v.duration - .02); const fin = () => { show(v); k = j; busy = false; mark(); warm(); if (after) after(); else tick(); };
     if (Math.abs(v.currentTime - t) < .001) return fin(); v.addEventListener('seeked', fin, { once: true }); v.currentTime = t; };
   v.readyState >= 1 ? seek() : v.addEventListener('loadedmetadata', seek, { once: true }); };
 /* 自动循环（他 11-17）：平时不动；按 L 或点「循环」才启动——马上播下一页，之后每页播完停 HOLD 秒自动进下一页，最后一页停完回到最开头接着播。再按一次停。循环中手动翻页、跳页照常，停留时间重新算。 */
@@ -37,6 +50,12 @@ const fs = () => document.fullscreenElement ? document.exitFullscreen() : docume
 const bar = document.getElementById('bar'), mk = (txt, fn, kk) => { const b = document.createElement('button'); b.textContent = txt; if (kk !== undefined) b.dataset.k = kk; b.onclick = e => { e.stopPropagation(); fn(); b.blur(); }; bar.appendChild(b); return b; };
 mk('‹', prev); for (let i = 0; i <= N; i++) mk(String(i), () => jump(i), i); mk('›', next); bar.appendChild(Object.assign(document.createElement('div'), { className: 'sep' })); mk('⛶ 全屏', fs); const lb = mk('⟳ 循环', () => setLoop(!loop)); mark();
 let idleT; const wake = () => { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('idle'), 2500); }; addEventListener('mousemove', wake);
+/* 点画面＝下一页（点底下按钮不算）；手机/平板：左滑下一页、右滑上一页，点一下也是下一页并显示按钮条 */
+let tx = null, ty = 0;
+addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; wake(); }, { passive: true });
+addEventListener('touchend', e => { if (tx === null || e.target.closest('#bar')) { tx = null; return; } const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { dx < 0 ? next() : prev(); } else if (Math.abs(dx) < 10 && Math.abs(dy) < 10) next(); e.preventDefault(); }, { passive: false });
+addEventListener('click', e => { if (e.target.closest('#bar')) return; next(); });
 let typed = '', typeT; const num = document.getElementById('num');
 addEventListener('keydown', e => { if (/^[0-9]$/.test(e.key)) { typed += e.key; num.textContent = typed; num.style.display = 'block'; clearTimeout(typeT); typeT = setTimeout(() => { const j = +typed; typed = ''; num.style.display = 'none'; jump(j); }, 600); return; }
   if (['ArrowRight', '>', '.', ' ', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); next(); } else if (['ArrowLeft', '<', ',', 'PageUp'].includes(e.key)) prev(); else if (e.key === 'f' || e.key === 'F') fs(); else if (e.key === 'l' || e.key === 'L') setLoop(!loop); });
