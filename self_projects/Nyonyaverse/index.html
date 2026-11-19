@@ -29,11 +29,11 @@ const warm = () => { for (const v of [F[k + 1], F[k + 2], R[k], R[k - 1]]) if (v
    按钮条最右边显示进度，变成 ✓ 就代表全部载入、之后翻页不会再等网络。本机双击打开（file://）时这段自动跳过。 */
 const done = new Set(), all = [];
 for (let i = 1; i <= N; i++) all.push(F[i], R[i]);
-const pr = document.createElement('span'); pr.style.cssText = 'color:#fff;font-size:13px;opacity:.75;padding:0 6px;white-space:nowrap';
+const pr = document.createElement('span'); pr.style.cssText = 'position:fixed;left:18px;bottom:16px;z-index:11;color:#fff;font-size:14px;font-weight:600;opacity:.7;text-shadow:0 1px 6px #000;transition:opacity .6s;white-space:nowrap';
 const swap = (v, url) => { if (v === cur || v.classList.contains('on')) { setTimeout(() => swap(v, url), 500); return; } v.src = url; v.preload = 'auto'; v.load(); };
 const pick = () => { let best = null, bd = 1e9; all.forEach(v => { if (done.has(v)) return; const i = F.indexOf(v) >= 0 ? F.indexOf(v) : R.indexOf(v) - .5; const d = i > k ? i - k : (k - i) + 1.5; if (d < bd) { bd = d; best = v; } }); return best; };
 async function fetchAll() { if (location.protocol === 'file:') return; let n = 0;
-  for (let v; (v = pick());) { done.add(v); try { const b = await (await fetch(v.src)).blob(); swap(v, URL.createObjectURL(b)); } catch (e) {} n++; pr.textContent = n < all.length ? `↓ ${n}/${all.length}` : '✓'; } }
+  for (let v; (v = pick());) { done.add(v); try { const b = await (await fetch(v.src)).blob(); swap(v, URL.createObjectURL(b)); } catch (e) {} n++; pr.textContent = n < all.length ? `Loading ${Math.round(n / all.length * 100)}%` : '✓ Ready'; } setTimeout(() => { pr.style.opacity = 0; }, 2500); }
 const run = (v, done) => { busy = true; cur = v; let ended = false;
   fin = () => { if (ended) return; ended = true; clearTimeout(guard); wait.style.display = 'none'; v.onended = null; v.pause();
     const end = () => { show(v); busy = false; cur = null; fin = null; done(); mark(); warm(); tick(); };
@@ -57,7 +57,7 @@ function tick() { clearTimeout(loopT); if (loop) loopT = setTimeout(() => { if (
 function setLoop(on) { loop = on; clearTimeout(loopT); lb.classList.toggle('cur', on); lb.textContent = on ? '■ 停止循环' : '⟳ 循环'; if (on) step(); }
 const fs = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
 const bar = document.getElementById('bar'), mk = (txt, fn, kk) => { const b = document.createElement('button'); b.textContent = txt; if (kk !== undefined) b.dataset.k = kk; b.onclick = e => { e.stopPropagation(); fn(); b.blur(); }; bar.appendChild(b); return b; };
-mk('‹', prev); for (let i = 0; i <= N; i++) mk(String(i), () => jump(i), i); mk('›', next); bar.appendChild(Object.assign(document.createElement('div'), { className: 'sep' })); mk('⛶ 全屏', fs); const lb = mk('⟳ 循环', () => setLoop(!loop)); bar.appendChild(pr); mark(); fetchAll();
+mk('‹', prev); for (let i = 0; i <= N; i++) mk(String(i), () => jump(i), i); mk('›', next); bar.appendChild(Object.assign(document.createElement('div'), { className: 'sep' })); mk('⛶ 全屏', fs); const lb = mk('⟳ 循环', () => setLoop(!loop)); document.body.appendChild(pr); mark(); fetchAll();
 let idleT; const wake = () => { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('idle'), 2500); }; addEventListener('mousemove', wake);
 /* 点画面＝下一页（点底下按钮不算）；手机/平板：左滑下一页、右滑上一页，点一下也是下一页并显示按钮条 */
 let tx = null, ty = 0;
