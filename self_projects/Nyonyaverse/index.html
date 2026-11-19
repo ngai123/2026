@@ -30,8 +30,7 @@ const warm = () => { for (const v of [F[k + 1], F[k + 2], R[k], R[k - 1]]) if (v
 const done = new Set(), all = [];
 for (let i = 1; i <= N; i++) all.push(F[i], R[i]);
 const pr = document.createElement('span'); pr.style.cssText = 'color:#fff;font-size:13px;opacity:.75;padding:0 6px;white-space:nowrap';
-const swap = (v, url) => { if (v === cur) { setTimeout(() => swap(v, url), 300); return; } const vis = v.classList.contains('on'), t = v.currentTime; v.src = url; v.preload = 'auto';
-  if (t > 0) v.addEventListener('loadedmetadata', () => { v.currentTime = t; }, { once: true }); if (vis) show(v); };
+const swap = (v, url) => { if (v === cur || v.classList.contains('on')) { setTimeout(() => swap(v, url), 500); return; } v.src = url; v.preload = 'auto'; v.load(); };
 const pick = () => { let best = null, bd = 1e9; all.forEach(v => { if (done.has(v)) return; const i = F.indexOf(v) >= 0 ? F.indexOf(v) : R.indexOf(v) - .5; const d = i > k ? i - k : (k - i) + 1.5; if (d < bd) { bd = d; best = v; } }); return best; };
 async function fetchAll() { if (location.protocol === 'file:') return; let n = 0;
   for (let v; (v = pick());) { done.add(v); try { const b = await (await fetch(v.src)).blob(); swap(v, URL.createObjectURL(b)); } catch (e) {} n++; pr.textContent = n < all.length ? `↓ ${n}/${all.length}` : '✓'; } }
