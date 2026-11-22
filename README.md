@@ -28,3 +28,4 @@ Master directory for all 2026 projects — self projects and open-source forks.
 | `claude-code` | [codeaashu/claude-code](https://github.com/codeaashu/claude-code) | Agentic coding tool CLI by Anthropic |
 | `MiroFish_NgaiNgai` | [666ghj/MiroFish](https://github.com/666ghj/MiroFish) | Universal swarm intelligence prediction engine |
 | `openreply` | [diwenne/openreply](https://github.com/diwenne/openreply) | Open-source Manychat alternative (Instagram comment → DM) |
+| `StudentOS` | [TheCodeSlingers/StudentOS](https://github.com/TheCodeSlingers/StudentOS) | Student operating system (TypeScript monorepo, MIT) |
